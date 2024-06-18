@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>채팅 목록과 채팅방</title>
+</head>
+<body>
+<h1>채팅 목록</h1>
+<ul id="chatList">
+    <li data-username="user1">User 1</li>
+    <li data-username="user2">User 2</li>
+    <li data-username="user3">User 3</li>
+</ul>
+
+<div id="chatRoom" style="display: none;">
+    <h2>채팅방</h2>
+    <div id="chatMessages"></div>
+    <input type="text" id="messageInput" placeholder="메시지를 입력하세요">
+    <button id="sendMessageBtn">전송</button>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        // 채팅 목록에서 아이템 클릭 시 채팅방 표시
+        $("#chatList li").click(function(){
+            var username = $(this).data("username");
+            showChatRoom(username);
+        });
+
+        // 메시지 전송 버튼 클릭 시
+        $("#sendMessageBtn").click(function(){
+            var message = $("#messageInput").val();
+            // 여기에 메시지 전송 로직 추가
+            $("#chatMessages").append("<p>You: " + message + "</p>");
+            $("#messageInput").val(""); // 메시지 입력 필드 비우기
+        });
+    });
+
+    // 채팅방 표시 함수
+    function showChatRoom(username) {
+        // 채팅방을 해당 사용자의 것으로 설정하고 표시
+        $("#chatRoom").show();
+        $("#chatRoom h2").text("채팅방 - " + username);
+    }
+</script>
+</body>
+</html>

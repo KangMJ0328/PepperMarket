@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+  /* font-family: "Noto Sans KR", sans-serif; */
+  font-family: DungGeunMo;
+  font-size: 15px;
+  font-weight: normal;
+  margin: 0;
+
+  padding: 0;
+}
+html {
+  overflow-y: scroll;
+}
+.main-content {
+  /*padding: 20px;*/
+  margin: 0 auto;
+  overflow: hidden;
+  width: 100%;
+}
+
+
+.container {
+  margin: 0 auto;
+  max-width: 1200px;
+  overflow: hidden;
+  position: relative;
+}

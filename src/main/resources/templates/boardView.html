@@ -1,0 +1,252 @@
+<!doctype html>
+<html
+	lang="ko"
+	layout:decorate="~{layouts/layout}"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+	<meta charset="UTF-8"/>
+	<title th:text="${board.title}"></title>
+	<link rel="stylesheet" th:href="@{/css/boardview.css}"/>
+</head>
+<body>
+<div layout:fragment="content">
+	<section class="wrapper">
+		<div class="product-container">
+			<div class="left-section">
+				<div class="product-image">
+					<img
+						alt="게시글 이미지"
+						onerror="this.src='/files/default.png'"
+						th:src="@{${board.filepath}}"
+					/>
+				</div>
+
+				<div class="seller-info">
+					<div class="seller-profile">
+						<a
+							class="seller-link"
+							th:href="@{'/profile/' + ${board.user.Id}}"
+						>
+							<div class="profile-info">
+								<div
+									class="seller-name"
+									th:text="${board.user.nickname}"
+								></div>
+								<div class="seller-items">
+									<div class="item-count-label">판매상품</div>
+									<div class="item-count" th:text="${userPostCount}"></div>
+								</div>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="right-section">
+				<div class="product-info">
+					<div class="category-box" th:text="${board.categName}">
+						카테고리명
+					</div>
+					<div class="product-name" th:text="${board.title}">상품명</div>
+					<div
+						class="price"
+						th:text="${board.getFormattedPrice()} + '원'"
+					></div>
+				</div>
+				<div class="product-status">
+					<div class="left">
+						<div
+							class="view-count"
+							th:text="|조회수 ${board.viewcount}|"
+						></div>
+						<span id="like-count" th:text="|좋아요: ${likeCount}개|">0</span>
+					</div>
+					<div class="additional-info right">
+						<div
+							class="condition"
+							th:text="|제품 상태: ${board.qualityHangul() != null ? board.qualityHangul() : '정보 없음'}|"
+						></div>
+						<div class="time-ago" th:text="|${board.getTimeAgo()}|"></div>
+					</div>
+				</div>
+				<div class="action-buttons">
+					<div class="like-chat">
+						<div class="like-set">
+							<a
+								class="like-button"
+								href="javascript:"
+								th:onclick="|toggleLike(${board.id})|"
+							>
+							</a>
+						</div>
+						<div class="chat-button edit-button">
+							<th:block
+								th:if="${board.user != null && loggedInUser != null && board.user.id != loggedInUser.id}"
+							>
+								<a
+									class="chat-text"
+									th:href="@{/chat/start(senderId=${loggedInUser.id},receiverId=${board.user.id},postId=${board.id})}"
+								>
+									<i class="far fa-comments fa-lg btn-icon chat-icon"></i
+									>판매자와 채팅하기
+								</a>
+							</th:block>
+							<th:block
+								th:if="${board.user != null && loggedInUser != null && (board.user.id == loggedInUser.id || 'admin' == loggedInUser.nickname)}"
+							>
+								<a
+									class="edit-text"
+									th:href="@{/board/modify/{id}(id=${board.id})}"
+								>
+									<i class="far fa-edit edit-icon fa-lg btn-icon"></i>글
+									수정
+								</a>
+							</th:block>
+							<th:block
+								th:if="${board.user != null && loggedInUser != null && (board.user.id == loggedInUser.id || 'admin' == loggedInUser.nickname)}"
+							>
+								<a
+									class="delete-text"
+									th:href="@{/board/delete/{id}(id=${board.id})}"
+								>
+									<i
+										class="far fa-trash-alt delete-icon fa-lg btn-icon"
+									></i>
+								</a>
+							</th:block>
+							<th:block th:if="${loggedInUser == null}">
+								<a class="gologin-text" href="/login">
+									<i class="far fa-comments fa-lg btn-icon chat-icon"></i
+									>로그인하고 거래하기
+								</a>
+							</th:block>
+						</div>
+					</div>
+				</div>
+				<div class="product-description" th:text="${board.content}">
+					상품 설명
+				</div>
+			</div>
+		</div>
+		<div>
+			<h3>댓글</h3>
+			<br/>
+			<div th:each="comment : ${comments}">
+				<p th:text="${comment.nickname}">Nickname</p>
+				<p th:text="${comment.content}">Content</p>
+				<th:block th:if="${loggedInUser != null && loggedInUser.username == comment.user.email}">
+					<form method="post" style="display:inline;" th:action="@{/comment/delete/{id}(id=${comment.id})}">
+						<input name="_method" type="hidden" value="DELETE"/>
+						<button type="submit">댓글 삭제</button>
+					</form>
+				</th:block>
+				<br/>
+			</div>
+		</div>
+
+		<div>
+			<h3>댓글 작성</h3>
+			<form method="post" th:action="@{/board/add-comment/{boardId}(boardId=${board.id})}">
+				<textarea name="content" placeholder="댓글 내용" required></textarea>
+				<button type="submit">댓글 작성</button>
+			</form>
+		</div>
+		<!-- 신고하기 폼 -->
+		<form id="reportForm" method="post" th:action="@{/report}">
+			<input name="boardId" th:value="${board.id}" type="hidden"/>
+			<label for="reason">신고 사유:</label>
+			<select id="reason" name="reason">
+				<option value="spam">스팸</option>
+				<option value="abuse">악용</option>
+				<option value="inappropriate">부적절한 내용</option>
+			</select>
+			<button type="submit">신고하기</button>
+		</form>
+	</section>
+
+	<script th:inline="javascript">
+      function isLike() {
+          const boardId = /*[[${board.id}]]*/ null;
+          const userEmail = /*[[${#authentication.name}]]*/ null;
+
+          $.ajax({
+              type: "GET",
+              url: "/board/like",
+              data: {
+                  boardId: boardId,
+                  userEmail: userEmail,
+              },
+              success: function (response) {
+                  // 기존 아이콘 제거
+                  $(".like-button .heart-icon").remove();
+
+                  // 새로운 아이콘 추가
+                  if (response.liked) {
+                      $(".like-button").append(
+                          `<i class="fas fa-heart heart-icon" style="color: #ff0000"></i>`,
+                      );
+                  } else {
+                      $(".like-button").append(
+                          `<i class="far fa-heart heart-icon"></i>`,
+                      );
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error("좋아요 상태 확인 중 오류 발생:", error);
+              },
+          });
+      }
+
+      function toggleLike(boardId) {
+          $.ajax({
+              type: "POST",
+              url: "/board/like",
+              data: {boardId: boardId},
+              success: function (response) {
+                  // 기존 아이콘 제거
+                  $(".like-button .heart-icon").remove();
+
+                  // 새로운 아이콘 추가
+                  if (response.liked) {
+                      $(".like-button").append(
+                          `<i class="fas fa-heart heart-icon" style="color: #ff0000"></i>`,
+                      );
+                      isLike();
+                  } else {
+                      $(".like-button").append(
+                          `<i class="far fa-heart heart-icon"></i>`,
+                      );
+                      isLike();
+                  }
+                  updateLikeCount(boardId);
+              },
+              error: function (xhr, status, error) {
+                  alert(xhr.responseText); // 오류 메시지 표시
+              },
+          });
+      }
+
+      function updateLikeCount(boardId) {
+          $.ajax({
+              type: "GET",
+              url: "/board/like/count",
+              data: {boardId: boardId},
+              success: function (response) {
+                  $("#like-count").text("좋아요: " + response + "개");
+              },
+              error: function (xhr, status, error) {
+                  console.error("좋아요 수 가져오기 중 오류 발생:", error);
+              },
+          });
+      }
+
+      $(document).ready(function () {
+
+          isLike();
+          updateLikeCount(boardId); // 페이지 로드 시 좋아요 수 업데이트
+      });
+	</script>
+</div>
+</body>
+</html>

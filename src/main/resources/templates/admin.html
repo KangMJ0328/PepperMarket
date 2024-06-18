@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Page</title>
+</head>
+<meta charset="UTF-8"/>
+<body>
+<h1>Welcome, <span th:text="${adminName}">Admin</span>!</h1>
+<h2>All Reports</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Reporter</th>
+        <th>Reported User</th>
+        <th>Reason</th>
+        <th>Date</th>
+    </tr>
+    <tr th:each="report : ${reports}">
+        <td th:text="${report.id}"></td>
+        <td th:text="${report.reporter}"></td>
+        <td th:text="${report.reportedUser}"></td>
+        <td th:text="${report.reason}"></td>
+        <td th:text="${report.reportedAt}"></td>
+    </tr>
+</table>
+</body>
+</html>

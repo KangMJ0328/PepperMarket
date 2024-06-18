@@ -1,0 +1,72 @@
+<!doctype html>
+<html
+        lang="en"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Pepper Market</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- 공통 CSS -->
+    <th:block th:replace="~{fragments/common-styles::styles}"></th:block>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            const userId = /*[[${#authentication.principal.id}]]*/ "anonymous"; // 로그인한 사용자의 ID
+
+            function loadChatRooms() {
+                $.ajax({
+                    type: "GET",
+                    url: `/chat/chats?userId=${userId}`,
+                    success: function (chatRooms) {
+                        const chatListContainer = $("#chatList");
+                        chatListContainer.empty();
+                        chatRooms.forEach((chatRoom) => {
+                            chatListContainer.append(
+                                `<div class="chat-list-box">
+                  <div class="chat-list-sender">
+                      <a href="#" class="chat-room-link" data-chat-room-id="${chatRoom.chatRoomId}" data-receiver-id="${chatRoom.partnerId}">
+                          ${chatRoom.partnerName}님과의 채팅
+                      </a>
+                  </div>
+                  <div class="post-link">
+                      <a href="/board/view?id=${chatRoom.postId}">
+                          ${chatRoom.postTitle} 게시글로 가기
+                      </a>
+                  </div>
+              </div>`,
+                            );
+                        });
+
+                        $(".chat-room-link").on("click", function (e) {
+                            e.preventDefault();
+                            const chatRoomId = $(this).data("chat-room-id");
+                            const receiverId = $(this).data("receiver-id");
+                            window.location.href = `/chat/room/${chatRoomId}?receiverId=${receiverId}`;
+                        });
+                    },
+                    error: function (error) {
+                        console.error("채팅 방 목록 로딩 중 오류 발생:", error);
+                    },
+                });
+            }
+
+            loadChatRooms();
+        });
+    </script>
+    <!-- CSS -->
+    <th:block layout:fragment="css"></th:block>
+</head>
+<body>
+<div th:replace="~{fragments/header::header}"></div>
+
+<div class="main-content" layout:fragment="content"></div>
+
+<div th:replace="~{fragments/footer::footer}"></div>
+<!-- JQuery 스크립트를 body 끝부분에 추가하는 것이 좋습니다. -->
+<th:block th:insert="~{fragments/scripts::script}"></th:block>
+<!-- 추가 스크립트가 필요한 경우 여기에 추가 -->
+</body>
+</html>

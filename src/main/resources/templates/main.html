@@ -1,0 +1,84 @@
+<!doctype html>
+<html
+	layout:decorate="~{layouts/layout}"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+>
+<th:block layout:fragment="css">
+	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<link rel="stylesheet" th:href="@{/css/boardcategories.css}"/>
+</th:block>
+<div layout:fragment="content">
+
+	<div class="main-content">
+		<div class="main-banner">
+			<img th:src="@{/img/banner.png}"/>
+		</div>
+		<div class="category-popular">
+			<h2>최근 올라온 상품들</h2>
+			<div class="product-album py-5 bg-light">
+				<div class="container">
+					<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+						<div class="col" th:each="board : ${list}">
+							<div class="card shadow-sm pop">
+								<a th:href="@{/board/view(id=${board.id})}">
+									<img
+										alt="상품이미지"
+										class="card-img-top goods-img"
+										height="300"
+										onerror="this.src='/files/default.png'"
+										th:src="${board.filepath}"
+										weight="225"
+										width="100%"
+									/>
+								</a>
+								<div class="card-body card-box">
+									<div class="card-cate">
+										<p th:text="${board.categName}"></p>
+									</div>
+									<a
+										class="card-t"
+										th:href="@{/board/view(id=${board.id})}"
+										th:text="${board.title}"
+									>제목</a
+									>
+									<span
+										class="card-price"
+										th:text="${board.getFormattedPrice()} + 원"
+									></span>
+									<div class="card-bottom">
+										<th:block th:unless="${board.writer !=  loggedUserId}">
+											<button
+												class="btn btn-sm btn-outline-secondary edit-button"
+												type="button"
+											><a th:href="@{/board/modify/{id}(id=${board.id})}">Edit</a>
+
+											</button>
+										</th:block>
+										<th:block th:if="${board.writer !=  loggedUserId}">
+											<button
+												class="btn btn-sm btn-outline-secondary edit-button"
+												style="visibility: hidden"
+												type="button"
+											>
+												Edit
+											</button>
+										</th:block>
+										<small
+											class="text-muted" th:text="${board.timeAgo}"
+										>timeago</small
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<button class="btn btn-primary" onclick="location.href='/board/list'" type="button">더 많은 상품
+						보기
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</html>

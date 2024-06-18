@@ -1,0 +1,169 @@
+* {
+  box-sizing: border-box;
+  font-family: DungGeunMo;
+  font-size: 15px;
+  font-weight: normal;
+}
+
+body,
+html {
+  align-items: center;
+  backdrop-filter: blur(2px);
+  background: linear-gradient(126deg, #37ea3e 4.79%, #1b8d20 54.4%);
+
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.container {
+}
+.login-wrapper {
+  background: #63ff87;
+  border-radius: 25px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  height: 0;
+  overflow: hidden;
+  padding-bottom: 65%;
+  position: relative;
+  width: 100%;
+}
+.login-box {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  justify-content: space-between;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.image-section {
+  align-items: center;
+  background: #f9ed32;
+  border-bottom-left-radius: 25px;
+  border-top-left-radius: 25px;
+  display: flex;
+  float: left;
+  position: relative;
+  width: 50%;
+}
+
+.title-image {
+  left: 0;
+  position: absolute;
+  width: 105%;
+}
+.form-section {
+  align-items: center;
+  background: #fcfeff;
+  border-radius: 25px;
+  bottom: 0;
+  display: flex;
+  /* padding: 40px; */
+  height: 100%;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  width: 50%;
+}
+
+.form-content {
+  max-width: 400px;
+  width: 100%;
+  z-index: 1;
+}
+
+.form-title {
+  color: black;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 26px;
+  font-weight: 600;
+  justify-content: center;
+  margin-bottom: 20px;
+  position: relative;
+  text-align: center;
+}
+
+.form-title > img {
+  margin: 0 auto;
+}
+
+.create-account-button {
+  background: #20b626;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  height: 60px;
+  margin: 20px 0 20px;
+  position: relative;
+  width: 100%;
+}
+
+.button-text {
+  color: white;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 60px;
+  text-align: center;
+}
+
+.login-text {
+  color: #7c838a;
+  font-size: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.login-text .login-link {
+  color: #20b626;
+  cursor: pointer;
+}
+
+.or-text {
+  color: #b0bac3;
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.social-signup img {
+  height: 30px;
+  margin: 0 20px;
+  width: 30px;
+}
+
+.reserved-text {
+  color: #7c838a;
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.social-signup-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.social-signup-btn {
+}
+.login-btn {
+  height: 50px;
+}
+
+.kakao > a {
+  height: 100%;
+  width: 100%;
+}
+.kakao img {
+  display: block;
+  height: 50%;
+  transform: translate(12.5px, 12.5px);
+  width: 50%;
+}

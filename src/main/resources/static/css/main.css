@@ -1,0 +1,55 @@
+/*// <uniquifier>: Use a unique and descriptive class name*/
+/*// <weight>: Use a value from 100 to 900*/
+
+/*.noto-sans-kr-<uniquifier > {*/
+/*  font-family: "Noto Sans KR", sans-serif;*/
+/*  font-optical-sizing: auto;*/
+/*  font-weight: <weight>;*/
+/*  font-style: normal;*/
+/*}*/
+
+* {
+  box-sizing: border-box;
+  /* font-family: "Noto Sans KR", sans-serif; */
+  margin: 0;
+  padding: 0;
+}
+
+.main-banner {
+}
+
+.category-popular,
+.categories {
+  margin: 40px auto;
+  max-width: 1200px;
+  overflow: hidden;
+  position: relative;
+}
+
+.category-popular .swiper-slide img,
+.categories .swiper-slide img {
+  height: 400px;
+  object-fit: cover;
+  position: relative;
+  width: 250px;
+  /* This ensures the image covers the container */
+}
+
+.pop > a > span {
+  background-color: rgba(0, 0, 0, 0.62);
+  bottom: 0;
+  color: #fff;
+  left: 0;
+  padding: 10px;
+  position: absolute;
+  right: 0;
+  text-align: right;
+}
+
+.categories .cat {
+  border: 1px solid #000;
+  border-radius: 50%;
+  height: 200px;
+  margin: 50px auto;
+  width: 200px;
+}

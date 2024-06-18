@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>사용자 목록</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6;
+        }
+        .table .table {
+            background-color: #fff;
+        }
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #212529;
+            text-align: center;
+            vertical-align: middle;
+            user-select: none;
+            background-color: transparent;
+            border: 1px solid transparent;
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .btn-primary {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-danger {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>사용자 목록</h2>
+    <a class="main" href="/">메인페이지</a>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>이메일</th>
+            <th>닉네임</th>
+            <th>정지 여부</th>
+            <th>작업</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}">1</td>
+            <td th:text="${user.email}">user@example.com</td>
+            <td th:text="${user.nickname}">nickname</td>
+            <td th:text="${user.suspended ? '예' : '아니오'}">아니오</td>
+            <td>
+                <form method="post" th:action="@{/admin/suspend/{userId}(userId=${user.id})}" th:if="${!user.suspended}">
+                    <button class="btn btn-danger" type="submit">정지</button>
+                </form>
+                <form method="post" th:action="@{/admin/unsuspend/{userId}(userId=${user.id})}" th:if="${user.suspended}">
+                    <button class="btn btn-primary" type="submit">정지 해제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

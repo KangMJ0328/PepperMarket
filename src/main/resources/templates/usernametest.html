@@ -1,0 +1,33 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+  </head>
+  <body>
+    <p th:text="${#authentication.name}"></p>
+    <p th:text="${#authentication.authorities}"></p>
+    <p th:text="${#authentication.authenticated}"></p>
+    <p th:text="${#authentication.principal.nickname}"></p>
+    <div sec:authorize="isAuthenticated()">로그인</div>
+    <div sec:authorize="isAnonymous()">고르아웃</div>
+
+    <table>
+      <tr>
+        <td>Username</td>
+        <td><span sec:authentication="name"></span></td>
+      </tr>
+      <tr>
+        <td>Authorities</td>
+        <td><span sec:authentication="principal.authorities"></span></td>
+      </tr>
+      <tr>
+        <td>Authorities</td>
+        <td><span sec:authentication="principal"></span></td>
+      </tr>
+    </table>
+  </body>
+</html>

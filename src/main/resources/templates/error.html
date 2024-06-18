@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>오류 페이지</title>
+    <style>
+      body {
+        align-items: center;
+        background-color: #f8f9fa;
+        color: #343a40;
+        display: flex;
+        font-family: "Arial", sans-serif;
+        height: 100vh;
+        justify-content: center;
+        margin: 0;
+      }
+      .container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+      }
+      h1 {
+        color: #dc3545;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+      }
+      p {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+      }
+      .error-code {
+        color: #6c757d;
+        font-size: 1em;
+        margin-bottom: 20px;
+      }
+      a {
+        background-color: #007bff;
+        border-radius: 5px;
+        color: white;
+        display: inline-block;
+        font-size: 1em;
+        padding: 10px 20px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+      a:hover {
+        background-color: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>오류 발생</h1>
+      <p th:text="${msg}">오류가 발생했습니다.</p>
+      <div class="error-code">error code : <span th:text="${code}"></span></div>
+      <a href="/">메인 페이지로 돌아가기</a>
+    </div>
+  </body>
+</html>

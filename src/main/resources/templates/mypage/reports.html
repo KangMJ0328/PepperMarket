@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Reports</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+</head>
+<body>
+<h1>My Reports</h1>
+
+<!-- 신고 기능 양식 -->
+<form action="/mypage/report" method="post">
+    <div>
+        <label for="reportedUser">Reported User:</label>
+        <input type="text" id="reportedUser" name="reportedUser" required>
+    </div>
+    <div>
+        <label for="reason">Reason:</label>
+        <input type="text" id="reason" name="reason" required>
+    </div>
+    <div>
+        <button type="submit">Report</button>
+    </div>
+</form>
+
+<!-- 내 신고 목록 테이블 -->
+<h2>My Reports</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Reported User</th>
+        <th>Reason</th>
+        <th>Date</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="report : ${myReports}">
+        <td th:text="${report.id}"></td>
+        <td th:text="${report.reportedUser}"></td>
+        <td th:text="${report.reason}"></td>
+        <td th:text="${report.reportedAt}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

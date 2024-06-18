@@ -1,0 +1,363 @@
+<!doctype html>
+<html
+  lang="en"
+  layout:decorate="~{layouts/layout}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <link rel="stylesheet" th:href="@{/css/boardcategories.css}" />
+    <title>Pepper Market</title>
+  </head>
+  <body>
+    <div class="main-content" layout:fragment="content">
+      <div class="wrapper">
+        <div class="category-section">
+          <div class="category-container">
+            <div class="category-toggle-wrapper">
+              <div class="category-toggle category-toggle1">
+                <div class="category-toggle-content">
+                  <span class="filtername">카테고리</span>
+                  <img
+                    alt="화살표 아래 아이콘"
+                    src="https://ccimage.hellomarket.com/img/web/search/filter/white_arrow.svg"
+                  />
+                </div>
+              </div>
+              <div class="category-toggle category-toggle2">
+                <div class="category-toggle-content">
+                  <span class="filtername">가격</span>
+                  <img
+                    alt="화살표 아래 아이콘"
+                    src="https://ccimage.hellomarket.com/img/web/search/filter/white_arrow.svg"
+                  />
+                </div>
+              </div>
+              <div class="isA-box">
+                <div class="form-check is-available">
+                  <input
+                    class="form-check-input"
+                    id="showCompleted"
+                    onchange="fetchBoardListData()"
+                    type="checkbox"
+                  />
+                  <label class="form-check-label" for="showCompleted">
+                    판매 완료된 상품도 보기
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="reset-filter ca">
+              <a
+                class="reset-button"
+                th:href="@{/board/list(page=${page},searchKeyword=${searchKeyword}, searchCateID=)}"
+              >
+                <div class="reset-text">필터 초기화</div>
+                <img
+                  alt="reset"
+                  class="reset-icon"
+                  src="https://ccimage.hellomarket.com/img/web/search/filter/refresh.svg"
+                />
+              </a>
+            </div>
+          </div>
+
+          <div class="category-list category-sublist1" style="display: none">
+            <div class="category-list-container">
+              <div class="category-item">
+                <div class="category-name">카테고리</div>
+              </div>
+              <div class="category-count">
+                <a
+                  class="category-link"
+                  th:href="@{/board/list(searchCateID='',searchKeyword=${param.searchKeyword})}"
+                  >전체</a
+                >
+                <div
+                  class="category-link-n"
+                  th:each="board, iterStat : ${categList}"
+                >
+                  <a
+                    class="category-link"
+                    th:classappend="'category' + ${iterStat.index + 1}"
+                    th:href="@{/board/list(searchCateID=${iterStat.index + 1},searchKeyword=${param.searchKeyword})}"
+                    th:text="${board} + ' (' + (${categoryPostCounts[iterStat.index + 1]} ?: 0) + ')'"
+                  ></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="category-list category-sublist2" style="display: none">
+            <div class="price-filter">
+              <input
+                class="min-price"
+                placeholder="최저금액"
+                type="text"
+                value=""
+              />
+              <div class="price-divider">원 부터~ &nbsp;</div>
+              <input
+                class="max-price"
+                placeholder="최고금액"
+                type="text"
+                value=""
+              />
+              <div class="price-divider">원 까지</div>
+              <button class="apply-button">적용하기</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-section">
+          <div class="product-count">
+            <div class="product-count-left">
+              <h2><span th:text="${categNow}"></span></h2>
+              <span class="count-text">
+                <!--                <span id="product-count"></span>개의 상품이 있습니다.-->
+                <span
+                  id="product-count"
+                  th:text="${list.getTotalElements()}"
+                ></span
+                >개의 상품이 있습니다.
+              </span>
+            </div>
+            <div class="recommendation">
+              <div class="recommendation-text">추천순</div>
+              <img
+                alt="정렬 아이콘"
+                class="sort-icon"
+                src="https://ccimage.hellomarket.com/img/web/search/itemList/ico_sort.png"
+              />
+            </div>
+          </div>
+          <div id="product-list" th:fragment="content">
+            <div class="product-album py-5 bg-light">
+              <div class="container">
+                <div
+                  class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 boards"
+                >
+                  <div class="col" th:each="board : ${list}">
+                    <div class="card shadow-sm">
+                      <a
+                        th:classappend="${board.status != 3 ? 'available' : 'unavailable'}"
+                        th:href="@{/board/view(id=${board.id})}"
+                        >거래 완료</a
+                      >
+                      <a th:href="@{/board/view(id=${board.id})}">
+                        <img
+                          alt="상품이미지"
+                          class="card-img-top goods-img"
+                          height="300"
+                          onerror="this.src='/files/default.png'"
+                          th:src="@{/files/{filename}(filename=${board.filename})}"
+                          weight="225"
+                          width="100%"
+                        />
+                      </a>
+
+                      <div class="card-body card-box">
+                        <div class="card-cate">
+                          <p th:text="${board.categName}"></p>
+                        </div>
+                        <a
+                          class="card-t"
+                          th:href="@{/board/view(id=${board.id})}"
+                          th:text="${board.title}"
+                          >제목</a
+                        >
+                        <span
+                          class="card-price"
+                          th:text="${board.getFormattedPrice()} + '원'"
+                        ></span>
+
+                        <i
+                          class="heart-icon"
+                          th:classappend="${board.liked} ? 'fas fa-heart' : 'far fa-heart'"
+                          th:style="${board.liked} ? 'color: #ff0000' : ''"
+                        ></i>
+                        <div class="card-bottom">
+                          <th:block th:if="${board.writer == loggedUserId}">
+                            <button
+                              class="btn btn-sm btn-outline-secondary edit-button"
+                              type="button"
+                            >
+                              <a th:href="@{/board/modify/{id}(id=${board.id})}"
+                                >Edit</a
+                              >
+                            </button>
+                          </th:block>
+                          <th:block th:unless="${board.writer == loggedUserId}">
+                            <button
+                              class="btn btn-sm btn-outline-secondary edit-button"
+                              style="visibility: hidden"
+                              type="button"
+                            >
+                              Edit
+                            </button>
+                          </th:block>
+                          <div class="like-section">
+                            <span
+                              th:text="${board.likecount != null ? board.likecount : 0}"
+                              >0</span
+                            >
+                            Likes
+                          </div>
+
+                          <small
+                            class="text-muted"
+                            th:text="${board.getTimeAgo()}"
+                            >timeago</small
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <!-- Previous button -->
+                <li
+                  class="page-item"
+                  th:classappend="${nowPage == 1} ? 'disabled'"
+                >
+                  <a
+                    aria-label="Previous"
+                    class="page-link"
+                    href="javascript:void(0);"
+                    th:onclick="|fetchBoardListData(${startPage - 1})|"
+                  >
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                <!-- Page numbers -->
+                <th:block
+                  th:each="page : ${#numbers.sequence(startPage, endPage)}"
+                >
+                  <li
+                    class="page-item"
+                    th:classappend="${page == nowPage} ? 'active'"
+                    th:if="${page > 0}"
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0);"
+                      th:onclick="|fetchBoardListData(${page - 1})|"
+                      th:text="${page}"
+                    ></a>
+                  </li>
+                </th:block>
+                <!-- Next button -->
+                <li
+                  class="page-item"
+                  th:classappend="${nowPage == totalPage} ? 'disabled'"
+                >
+                  <a
+                    aria-label="Next"
+                    class="page-link"
+                    href="javascript:void(0);"
+                    th:onclick="|fetchBoardListData(${endPage + 1})|"
+                  >
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+      <script>
+        function getCurrentCategoryId() {
+          const urlParams = new URLSearchParams(window.location.search);
+          return urlParams.get("searchCateID");
+        }
+
+        function applyStyleToSelectedCategory() {
+          const currentCategoryId = getCurrentCategoryId();
+          let selectedCategory = null;
+
+          if (currentCategoryId !== null) {
+            selectedCategory = document.querySelector(
+              ".category" + currentCategoryId,
+            );
+            selectedCategoryTab = document.querySelector(".category-toggle");
+          }
+
+          if (selectedCategory !== null) {
+            selectedCategory.style.color = "red";
+            selectedCategoryTab.style.backgroundColor = "red";
+            selectedCategoryTab.style.color = "white";
+          }
+        }
+
+        function toggleCategory(sublistClass) {
+          const sublists = [
+            ".category-sublist1",
+            ".category-sublist2",
+            ".category-sublist3",
+          ];
+          sublists.forEach((sublist) => {
+            if (sublist === sublistClass) {
+              $(sublist).slideToggle();
+            } else {
+              $(sublist).slideUp();
+            }
+          });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+          $(".category-toggle1").click(function () {
+            toggleCategory(".category-sublist1");
+          });
+          $(".category-toggle2").click(function () {
+            toggleCategory(".category-sublist2");
+          });
+
+          applyStyleToSelectedCategory();
+        });
+      </script>
+
+      <script>
+        function getUrlParameter(name) {
+          name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+          var regex = new RegExp("[\\?&]" + name + "=([^&#]*)");
+          var results = regex.exec(location.search);
+          return results === null
+            ? ""
+            : decodeURIComponent(results[1].replace(/\+/g, " "));
+        }
+
+        function fetchBoardListData(page) {
+          var showCompleted = document.getElementById("showCompleted").checked;
+          var searchKeyword = getUrlParameter("searchKeyword");
+          var searchCateID = getUrlParameter("searchCateID");
+
+          $.ajax({
+            url: "/board/list",
+            type: "GET",
+            data: {
+              // showCompleted: showCompleted,
+              page: page || 0, // Use the provided page parameter or default to 0
+              ajax: true, // Ajax request indicator
+              showCompleted: showCompleted,
+              searchKeyword: searchKeyword,
+              searchCateID: searchCateID,
+            },
+            success: function (response) {
+              $("#product-list").html(response);
+            },
+            error: function (error) {
+              console.error("Error fetching board list data:", error);
+            },
+          });
+        }
+
+        $(document).ready(function () {
+          fetchBoardListData(0);
+        });
+      </script>
+    </div>
+  </body>
+</html>

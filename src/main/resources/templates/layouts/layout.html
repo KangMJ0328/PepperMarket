@@ -1,0 +1,34 @@
+<!doctype html>
+<html
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pepper Market</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <!--    jQuery      -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- 공통 css -->
+    <th:block th:replace="~{fragments/common-styles::styles}"></th:block>
+    <!--    CSS     -->
+    <th:block layout:fragment="css"></th:block>
+  </head>
+  <body>
+    <div th:replace="~{fragments/header::header}"></div>
+
+    <div class="container" layout:fragment="content"></div>
+    <div class="upload-wrapper">
+      <a class="write" href="/board/write" role="button">
+        <i aria-hidden="true" class="fas fa-pen-square"> &nbsp; </i>
+        내 물건 올리기
+      </a>
+    </div>
+
+    <div th:replace="~{fragments/footer::footer}"></div>
+
+    <!--    JS      -->
+    <th:block th:insert="~{fragments/scripts::script}"></th:block>
+  </body>
+</html>

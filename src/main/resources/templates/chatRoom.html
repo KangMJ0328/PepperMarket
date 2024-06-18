@@ -1,0 +1,235 @@
+<!doctype html>
+<html
+	lang="en"
+	layout:decorate="~{layouts/chatlayout}"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+	<meta charset="UTF-8"/>
+	<title>Chat Room</title>
+	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<link rel="stylesheet" th:href="@{/css/chat_page.css}"/>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.4.0/dist/sockjs.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<div layout:fragment="content">
+	<div class="container">
+		<h2>My Chats</h2>
+		<div class="chat-container">
+			<div class="chat-list">
+				<div id="chat-list-section">
+					<ul id="chatList">
+						<!-- 채팅 목록이 여기에 동적으로 추가됩니다 -->
+					</ul>
+				</div>
+			</div>
+			<div class="chat-content">
+				<div class="chat-msg-container row-cols-1">
+					<div class="chat-room-detail">
+						<div id="postPic"></div>
+						<div class="chat-room-detail-text">
+							<div id="postTitle"></div>
+							<div id="partnerName"></div>
+						</div>
+
+					</div>
+
+					<div class="chat-msg" id="msgArea" style="height: 50vh">
+						<!-- 채팅 내용이 여기에 표시됩니다 -->
+					</div>
+					<div class="chat-input">
+						<div class="input-group mb-3">
+							<input
+								aria-describedby="button-addon2"
+								class="messageInput"
+								id="msg"
+								placeholder="메세지를 입력해주세요."
+								type="text"
+							/>
+							<div class="input-group-append">
+								<button
+									class="btn btn-outline-secondary sendButton"
+									id="button-send"
+									type="button"
+								>
+									전송
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<script th:inline="javascript">
+            $(document).ready(function () {
+                const userId = /*[[${#authentication.principal.id}]]*/ "anonymous"; // 로그인한 사용자의 ID
+                const chatRoomId = /*[[${chatRoomId}]]*/ "defaultRoom"; // 채팅방 ID
+                const receiverId = /*[[${receiverId}]]*/ "defaultReceiver"; // 수신자 ID
+
+                function displayMessage(message) {
+                    var senderName = message.sender.nickname; // 보낸 사람의 닉네임
+                    var timestamp = new Date(message.timestamp);
+                    var options = {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        timeZone: "Asia/Seoul",
+                    };
+                    var formattedTime = timestamp.toLocaleTimeString("ko-KR", options);
+
+                    var fromWhoBox =
+                        message.sender.id === userId ? "from-me" : "from-partner";
+                    var fromWhoMsg =
+                        message.sender.id === userId ? "from-me-box" : "from-partner-box";
+                    var name = message.sender.id === userId ? "" : senderName;
+
+                    var str = "<div class='col msg-box " + fromWhoBox + "'>";
+                    str += "<div class='sender'>" + name + "</div>";
+                    str += "<div class='msg-content-box'>";
+                    str += "<div class='msg " + fromWhoMsg + "'>";
+                    str += message.content;
+                    str += "</div>";
+                    str += "<div class='msg-time'>" + formattedTime + "</div>";
+                    str += "</div></div>";
+
+                    $("#msgArea").append(str);
+                    $("#msgArea").scrollTop($("#msgArea")[0].scrollHeight);
+                }
+
+                function loadCurrentChatRoomInfo(chatRoomId) {
+                    $.ajax({
+                        type: "GET",
+                        url: `/chat/chatRoom/${chatRoomId}`,
+                        success: function (chatRoomInfo) {
+                            $("#partnerName").text(`${chatRoomInfo.partnerName}님`);
+                            $("#postPic").html(`<img src="${chatRoomInfo.postPic}">`);
+                            $("#postTitle").html(`${chatRoomInfo.postTitle}
+																									<a href="/board/view?id=${chatRoomInfo.postId}">게시글로 가기 > </a>`);
+                            // 게시글 제목을 가져오는 Ajax 호출
+
+                            getPreviousChatMessages(chatRoomId);
+                        },
+                        error: function (error) {
+                            console.error("채팅방 정보 로딩 중 오류 발생:", error);
+                        },
+                    });
+                }
+
+                function loadChatRooms() {
+                    $.ajax({
+                        type: "GET",
+                        url: `/chat/chats?userId=${userId}`,
+                        success: function (chatRooms) {
+                            const chatListContainer = $("#chatList");
+                            chatListContainer.empty();
+                            chatRooms.forEach((chatRoom) => {
+                                chatListContainer.append(
+                                    `<div class="chat-list-box">
+                  <div class="chat-list-sender">
+                      <a href="#" class="chat-room-link" data-chat-room-id="${chatRoom.chatRoomId}" data-receiver-id="${chatRoom.partnerId}">
+                          ${chatRoom.partnerName}님과의 채팅
+                      </a>
+                  </div>
+                  <div class="post-link">
+                      <a href="/board/view?id=${chatRoom.postId}">
+                          ${chatRoom.postTitle} 게시글로 가기
+                      </a>
+                  </div>
+              </div>`,
+                                );
+                            });
+
+                            $(".chat-room-link").on("click", function (e) {
+                                e.preventDefault();
+                                const chatRoomId = $(this).data("chat-room-id");
+                                const receiverId = $(this).data("receiver-id");
+                                window.location.href = `/chat/room/${chatRoomId}?receiverId=${receiverId}`;
+                            });
+                        },
+                        error: function (error) {
+                            console.error("채팅 방 목록 로딩 중 오류 발생:", error);
+                        },
+                    });
+                }
+
+                function getPreviousChatMessages(chatRoomId) {
+                    fetch("/chat/messages/" + chatRoomId)
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error("Network response was not ok");
+                            }
+                            return response.json();
+                        })
+                        .then((messages) => {
+                            if (Array.isArray(messages)) {
+                                $("#msgArea").empty(); // 기존 메시지 지우기
+                                messages.forEach(displayMessage);
+                            } else {
+                                throw new Error("Invalid response format");
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "There has been a problem with your fetch operation:",
+                                error,
+                            );
+                        });
+                }
+
+                $("#button-send").on("click", (e) => {
+                    send();
+                });
+
+                const socket = new SockJS("/ws/chat");
+                const stompClient = Stomp.over(socket);
+
+                stompClient.connect({}, function (frame) {
+                    console.log("Connected: " + frame);
+
+                    stompClient.subscribe("/topic/public", function (messageOutput) {
+                        const message = JSON.parse(messageOutput.body);
+                        displayMessage(message);
+                    });
+                });
+
+                function send() {
+                    const messageContent = document.getElementById("msg").value.trim();
+
+                    if (messageContent === "") {
+                        return;
+                    }
+                    const message = {
+                        senderId: userId,
+                        receiverId: receiverId,
+                        content: messageContent,
+                        chatRoomId: chatRoomId,
+                    };
+                    stompClient.send(
+                        "/app/chat.sendMessage",
+                        {},
+                        JSON.stringify(message),
+                    );
+
+                    document.getElementById("msg").value = "";
+                }
+
+                socket.onclose = function (event) {
+                    console.log("WebSocket closed: ", event);
+                };
+
+                socket.onerror = function (event) {
+                    console.error("WebSocket error: ", event);
+                };
+
+                loadChatRooms();
+                loadCurrentChatRoomInfo(chatRoomId);
+            });
+				</script>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

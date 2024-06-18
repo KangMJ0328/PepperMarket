@@ -1,0 +1,24 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Message</title>
+</head>
+<body>
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  var message = /*[[${message}]]*/ 'Default message';
+  alert(message);
+
+  // 현재 설정된 redirectUrl 값을 확인하기 위해 콘솔에 출력
+  var redirectUrl = /*[[${redirectUrl}]]*/ '/default/url';
+  console.log("Redirect URL: " + redirectUrl);
+
+  // 기본 값인 경우에는 이동하지 않도록 수정
+  if (redirectUrl !== '/default/url') {
+    location.replace(redirectUrl);
+  }
+  /*]]>*/
+</script>
+</body>
+</html>

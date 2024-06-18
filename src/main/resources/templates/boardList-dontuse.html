@@ -1,0 +1,119 @@
+<!doctype html>
+<html xmlns:th="http://www.thymleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Insert title here</title>
+    <style>
+      .layout {
+        width: 500px;
+        margin: 0 auto;
+        margin-top: 40px;
+      }
+
+      .like {
+        width: 100px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .heart {
+        width: 30px;
+        height: 30px;
+        background-color: #ccc;
+      }
+
+      .on {
+        background-color: #ff7979;
+      }
+
+      .off {
+        opacity: 0.8;
+      }
+
+      img {
+        width: 50px;
+        height: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <button onclick="location.href='/logout'" type="button">로그아웃</button>
+    <div class="layout">
+      <a th:href="@{/board/write}">글 작성</a>
+      <table>
+        <thead>
+          <tr>
+            <th>글 번호</th>
+            <th>글 제목</th>
+            <th>&nbsp;</th>
+            <th>조회수</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="board : ${list}">
+            <td th:text="${board.id}">1</td>
+            <td>
+              <a
+                th:href="@{/board/view(id=${board.id})}"
+                th:text="${board.title}"
+                >제목</a
+              >
+              <div th:unless="${board.filepath}==null">
+                <img th:src="${board.filepath}" />
+              </div>
+
+              <div th:if="${board.filepath}==null">
+                <img alt="" src="/files/default.png" />
+              </div>
+            </td>
+
+            <td></td>
+            <td th:text="${board.viewcount}">0</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <a th:href="@{/board/list(page=0)}">첫 페이지</a>
+
+      <th:block th:each="page : ${#numbers.sequence(startPage, endPage)}">
+        <a
+          th:href="@{/board/list(page=${page-1},
+			searchKeyword = ${param.searchKeyword})}"
+          th:if="${page != nowPage}"
+          th:text="${page}"
+        ></a>
+        <strong
+          style="color: red"
+          th:if="${page == nowPage}"
+          th:text="${page}"
+        ></strong>
+      </th:block>
+
+      <a th:href="@{/board/list(page=${totalPage-1})}">마지막 페이지</a>
+
+      <form method="get" th:action="@{/board/list}">
+        <input name="searchKeyword" type="text" />
+        <button type="submit">검색</button>
+      </form>
+
+      <p>총 게시물 수 <span th:text="${list.getTotalElements()}"></span></p>
+      <a th:href="@{/chat}">채팅</a>
+      <script>
+        window.onpageshow = function (event) {
+          if (event.persisted) {
+            window.location.reload();
+          }
+        };
+      </script>
+
+      <script>
+        let indic = document.querySelectorAll(".heart");
+        indic.forEach((el) => {
+          el.classList.add(el.innerHTML === "true" ? "on" : "off");
+          el.innerHTML = " ";
+        });
+      </script>
+    </div>
+  </body>
+</html>

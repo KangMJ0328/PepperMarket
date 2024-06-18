@@ -1,0 +1,260 @@
+<!doctype html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layouts/mypagelayout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>마이 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}" />
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <h1>마이 페이지</h1>
+      <p>
+        닉네임: <span id="nicknameDisplay" th:text="${user.nickname}"></span>
+      </p>
+      <p>이메일: <span id="emailDisplay" th:text="${user.email}"></span></p>
+      <p>
+        소셜 아이디:
+        <span id="socialIdDisplay" th:text="${user.socialId}"></span>
+      </p>
+      <p>
+        제공자: <span id="providerDisplay" th:text="${user.provider}"></span>
+      </p>
+      <p>
+        제공자 아이디:
+        <span id="providerIdDisplay" th:text="${user.providerId}"></span>
+      </p>
+      <input id="userId" th:value="${user.id}" type="hidden" />
+
+      <!-- 프로필 정보 변경 섹션 -->
+      <section id="profile-info-section">
+        <h2>프로필 정보 변경</h2>
+        <form id="profile-info-form">
+          <label for="nickname">닉네임:</label>
+          <input
+            id="nickname"
+            name="nickname"
+            th:value="${user.nickname}"
+            type="text"
+          /><br />
+
+          <label for="email">이메일:</label>
+          <input
+            id="email"
+            name="email"
+            th:value="${user.email}"
+            type="email"
+            readonly
+          /><br />
+
+          <label for="name">이름:</label>
+          <input
+            id="name"
+            name="name"
+            th:value="${user.name}"
+            type="text"
+          /><br />
+          <label for="birthdate">생년월일:</label>
+          <input
+            type="date"
+            name="birthdate"
+            id="birthdate"
+            th:value="${#dates.format(user.birthdate, 'yyyy-MM-dd')}"
+          /><br />
+
+          <button type="submit">프로필 정보 변경</button>
+        </form>
+      </section>
+
+      <!-- 키워드 관리 섹션 -->
+      <section id="keywords-section">
+        <label for="new-keyword">키워드 목록</label>
+        <input
+          id="new-keyword"
+          placeholder="새 키워드를 입력하세요"
+          type="text"
+        />
+        <button onclick="addKeyword()">추가</button>
+        <div id="keyword-list"></div>
+      </section>
+
+      <!--      &lt;!&ndash; *최근 본 상품 목록 섹션* &ndash;&gt;-->
+      <!--      <section id="recent-viewed-posts-section">-->
+      <!--        <h2>최근 본 상품 목록</h2>-->
+      <!--        <ul id="recentViewedPostsList">-->
+      <!--          &lt;!&ndash; 최근 본 상품 목록이 여기에 동적으로 추가됩니다 &ndash;&gt;-->
+      <!--        </ul>-->
+      <!--      </section>-->
+
+      <!-- 모달 창 추가 -->
+      <div
+        class="modal fade"
+        id="successModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="successModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="successModalLabel">PepperMarket</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">변경이 완료되었습니다.</div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-dismiss="modal"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script th:inline="javascript">
+        // API URL 설정
+        const API_BASE_URL = "/keywords";
+        const NOTIFICATION_API_URL = "/notifications";
+        const RECENT_VIEWED_POSTS_API_URL = "/recent-viewed-posts";
+
+        // 프로필 변경 팝업
+        $(document).ready(function () {
+          $("#profile-info-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            const nickname = $("#nickname").val();
+            const email = $("#email").val();
+            const name = $("#name").val();
+            const birthdate = $("#birthdate").val();
+
+            $.ajax({
+              type: "POST",
+              url: "/mypage/change-profile-info",
+              data: {
+                nickname: nickname,
+                email: email,
+                name: name,
+                birthdate: birthdate,
+              },
+              success: function () {
+                $("#successModal").modal("show"); // 모달 표시
+                // 프로필 정보 업데이트
+                $("#nicknameDisplay").text(nickname);
+                $("#emailDisplay").text(email);
+                $("#nameDisplay").text(name);
+                $("#birthdateDisplay").text(birthdate);
+
+                // ******** 모달을 일정 시간 후 자동으로 닫기 ********
+                setTimeout(function () {
+                  $("#successModal").modal("hide");
+                }, 1000);
+              },
+              error: function () {
+                alert("프로필 정보 변경 중 오류가 발생했습니다.");
+              },
+            });
+          });
+        });
+        // 키워드 추가 함수
+        function addKeyword() {
+          const keyword = $("#new-keyword").val();
+          const userId = $("#userId").val(); // 사용자 ID 가져오기
+          $.ajax({
+            type: "POST",
+            url: API_BASE_URL,
+            contentType: "application/json",
+            data: JSON.stringify({ keyword: keyword, userId: userId }),
+            success: function () {
+              loadKeywords();
+              $("#new-keyword").val("");
+            },
+            error: function (error) {
+              console.error("키워드 추가 중 오류 발생:", error);
+            },
+          });
+        }
+
+        // 키워드 삭제 함수
+        function deleteKeyword(id) {
+          $.ajax({
+            type: "DELETE",
+            url: `${API_BASE_URL}/${id}`,
+            success: function () {
+              loadKeywords();
+            },
+            error: function (error) {
+              console.error("키워드 삭제 중 오류 발생:", error);
+            },
+          });
+        }
+
+        // 키워드 목록 불러오기 함수
+        function loadKeywords() {
+          $.ajax({
+            type: "GET",
+            url: `${API_BASE_URL}`,
+            success: function (keywords) {
+              const keywordList = $("#keyword-list");
+              keywordList.empty();
+              keywords.forEach((keyword) => {
+                keywordList.append(
+                  `<div class = "keyword-item">${keyword.keyword} <i class="fas fa-times delete-keyword" onclick="deleteKeyword(${keyword.id})"></i></div>`,
+                );
+              });
+            },
+            error: function (error) {
+              console.error("키워드 목록 불러오기 중 오류 발생:", error);
+            },
+          });
+        }
+
+        // 최근 본 상품 목록 불러오기 함수
+        function loadRecentViewedPosts() {
+          const userId = $("#userId").val(); // 사용자 ID 가져오기
+          console.log("최근 본 상품 로딩 중:", userId); // 디버깅 로그 추가
+
+          $.ajax({
+            type: "GET",
+            url: `${RECENT_VIEWED_POSTS_API_URL}?userId=${userId}`,
+            success: function (viewedPosts) {
+              console.log("최근 본 상품 목록 가져옴:", viewedPosts); // 디버깅 로그 추가
+
+              const recentViewedPostsList = $("#recentViewedPostsList");
+              recentViewedPostsList.empty();
+              viewedPosts.forEach((post) => {
+                recentViewedPostsList.append(
+                  `<li><a href="/board/view/${post.id}">${post.title}</a></li>`,
+                );
+              });
+            },
+            error: function (error) {
+              console.error("최근 본 상품 목록 불러오기 중 오류 발생:", error);
+            },
+          });
+        }
+
+        // 페이지 로드 시 데이터 불러오기
+        $(document).ready(function () {
+          loadKeywords();
+          loadNotifications();
+          loadChatRooms();
+          loadRecentViewedPosts();
+        });
+      </script>
+    </div>
+  </body>
+</html>
