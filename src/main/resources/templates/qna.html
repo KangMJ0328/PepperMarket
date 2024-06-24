@@ -1,0 +1,265 @@
+<!doctype html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorate="~{layouts/mypagelayout}"
+>
+<head>
+
+    <meta charset="UTF-8" />
+    <title>문의</title>
+
+    <link rel="stylesheet" th:href="@{/css/qna.css}"/>
+
+</head>
+<body>
+<div layout:fragment="content">
+
+        <div id="wrapper">
+            <div id="container_wr">
+                <h2 class="sctt" style="
+                    position: relative;
+                    left: 30px;
+                ">자주 묻는 질문</h2>
+
+                <!-- 게시판 목록 시작 -->
+                <div id="bo_list" style="width:100%;">
+
+                    <form name="fboardlist" id="fboardlist" onsubmit="return fboardlist_submit(this);" method="post">
+                        <input type="hidden" name="bo_table" value="a08">
+                        <input type="hidden" name="sfl" value="">
+                        <input type="hidden" name="stx" value="">
+                        <input type="hidden" name="spt" value="">
+                        <input type="hidden" name="sca" value="">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="sw" value="">
+
+                        <div class="tbl_head01 ">
+
+                            <div class="faq">
+                                <p style="font-size: 16px;color: #6a6a6a;text-align: right;position: relative;left: 30px;">※ 각 질문을 클릭해 주시면 질문의 답변을 보실 수
+                                    있습니다. </p>
+                                <ul>
+                                    <!-- 제목 -->
+                                    <input type="hidden" name="bo_table" value="a08">
+                                    <input type="hidden" name="sfl" value="">
+                                    <input type="hidden" name="stx" value="">
+                                    <input type="hidden" name="spt" value="">
+                                    <input type="hidden" name="page" value="1">
+                                    <input type="hidden" name="sw" value="">
+
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q"><span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q"><span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q"><span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q"><span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q"><span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+                                    <li class="article">
+                                        <p class="new_qa">
+                                            <img src="img/pepper_tree.png" class="qa_img" alt="자주하는질문 q">
+                                            <span
+                                                class="sbsb">중고 거래는 페퍼마켓입니다</span>
+                                        </p>
+
+                                        <div class="text" style="overflow: hidden; display: none;">
+                                        <span style="margin-left: 50px;">
+                                            고추거래 노하우로 시작부터 끝까지 꼼꼼하게 안내해 드립니다.
+                                        </span>
+                                        </div>
+                                    </li>
+
+
+
+                                </ul>
+
+                            </div>
+
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    <div>문의: PepperMarket@peppermarket.com</div>
+
+        <script type="text/javascript">
+            // 코너 버튼 적용
+            $(window).load(function () {
+                $("span.td_ask").corner(); // Q 아이콘
+                $("span.td_answer").corner(); // A 아이콘
+            });
+        </script>
+        <script type="text/javascript">
+            jQuery(function () {
+
+                $(".new_qa").click(function () {
+                    $(this).toggleClass('on');
+                    $(this).next(".text").slideToggle(200);
+                });
+
+
+                var article = $('.faq .article');
+                article.addClass('hide')
+                article.find('.a').slideDown(100);
+
+                $('.faq .article').click(function () {
+                    var myArticle = $(this).parents('.article');
+                    if (myArticle.hasClass('hide')) {
+                        article.addClass('hide').removeClass('show');
+
+                        article.find('.a').slideUp(100);
+
+                        myArticle.removeClass('hide').addClass('show');
+                        myArticle.find('.a').slideUp(100);
+                    } else {
+
+                        myArticle.removeClass('show').addClass('hide');
+                        myArticle.find('.a').slideDown(100);
+                    }
+                });
+
+
+            });
+        </script>
+
+        <script>
+            function all_checked(sw) {
+                var f = document.fboardlist;
+
+                for (var i = 0; i < f.length; i++) {
+                    if (f.elements[i].name == "chk_wr_id[]")
+                        f.elements[i].checked = sw;
+                }
+            }
+
+            function fboardlist_submit(f) {
+                var chk_count = 0;
+
+                for (var i = 0; i < f.length; i++) {
+                    if (f.elements[i].name == "chk_wr_id[]" && f.elements[i].checked)
+                        chk_count++;
+                }
+
+                if (!chk_count) {
+                    alert(document.pressed + "할 게시물을 하나 이상 선택하세요.");
+                    return false;
+                }
+
+                if (document.pressed == "선택복사") {
+                    select_copy("copy");
+                    return;
+                }
+
+                if (document.pressed == "선택이동") {
+                    select_copy("move");
+                    return;
+                }
+
+                if (document.pressed == "선택삭제") {
+                    if (!confirm("선택한 게시물을 정말 삭제하시겠습니까?\n\n한번 삭제한 자료는 복구할 수 없습니다\n\n답변글이 있는 게시글을 선택하신 경우\n답변글도 선택하셔야 게시글이 삭제됩니다."))
+                        return false;
+
+                    f.removeAttribute("target");
+                    f.action = "./board_list_update.php";
+                }
+
+                return true;
+            }
+
+            // 선택한 게시물 복사 및 이동
+            function select_copy(sw) {
+                var f = document.fboardlist;
+
+                if (sw == "copy")
+                    str = "복사";
+                else
+                    str = "이동";
+
+                var sub_win = window.open("", "move", "left=50, top=50, width=500, height=550, scrollbars=1");
+
+                f.sw.value = sw;
+                f.target = "move";
+                f.action = "./move.php";
+                f.submit();
+
+                // 이미지 리사이즈
+                $(".contentBox").viewimageresize();
+            }
+        </script>
+        <!-- } 게시판 목록 끝 -->
+
+        <!-- 펼쳐지는 스크립트-->
+        <script>
+            var old_i; // 전에 클릭했던 글의 번호값 저장
+            function view(i) { // 답변 표시여부 조정하는 js함수
+                if (old_i == i) {
+                    var mode = document.getElementById('view_' + i).style.display;
+                    if (mode == 'inline') document.getElementById('view_' + i).style.display = 'none';
+                    else document.getElementById('view_' + i).style.display = 'inline';
+                }
+                else {
+                    if (old_i) document.getElementById('view_' + old_i).style.display = 'none';
+                    document.getElementById('view_' + i).style.display = 'inline';
+                }
+                old_i = i;
+            }
+        </script>
+    </section>
+</div>
+</body>
+</html>

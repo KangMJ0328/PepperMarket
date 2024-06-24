@@ -1,0 +1,451 @@
+<!doctype html>
+<html
+  layout:decorate="~{layouts/layout}"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  xmlns:th="http://www.thymeleaf.org"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>마이 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/userprofilepage.css}" />
+  </head>
+  <body>
+    <div layout:fragment="content">
+      <div class="content-box">
+        <div class="stack-1">
+          <div class="username-box">
+            <p><span th:text="${user.nickname}"></span>님의 페이지</p>
+            <span th:text="${user.id}" style="display: none" id="userId"></span>
+          </div>
+        </div>
+        <div class="stack-2">
+          <div class="user-info">
+            <div class="stack-2-title">
+              <i class="fas fa-user"></i> UserInfo
+            </div>
+            <div class="user-info-box">
+              <div class="user-profile-pic">
+                <div class="user-profile-pic-img">
+                  <img th:src="@{${user.profilePicPath}}" />
+                </div>
+              </div>
+              <div class="user-nickname">
+                <span th:text="${user.nickname}"></span>
+              </div>
+              <div class="user-email">
+                <span id="userEmail" th:text="${user.email}"></span>
+              </div>
+            </div>
+          </div>
+          <div class="user-detail"></div>
+        </div>
+        <div class="stack-3">
+          <div class="post-list">
+            <button
+              class="btn btn-primary stack-3-btn user-posted"
+              data-bs-target="#posted-board-modal"
+              data-bs-toggle="modal"
+              id="showPostedBoards"
+              type="button"
+            >
+              <i class="fas fa-lg fa-inbox"></i>
+              <p>판매 내역</p>
+              <i class="xi-2x xi-tab"></i>
+            </button>
+          </div>
+          <div class="liked-list">
+            <button
+              class="btn btn-primary stack-3-btn user-liked"
+              data-bs-target="#liked-board-modal"
+              data-bs-toggle="modal"
+              id="showLikedBoards"
+              type="button"
+            >
+              <i class="far fa-lg fa-heart"></i>
+              <p>찜 목록</p>
+              <i class="xi-2x xi-tab"></i>
+            </button>
+          </div>
+          <!--          <div class="comment">-->
+          <!--            <button-->
+          <!--              class="btn btn-primary stack-3-btn user-comment"-->
+          <!--              type="button"-->
+          <!--            >-->
+          <!--              <i class="far fa-lg fa-comment-alt"></i>-->
+          <!--              <p>코멘트</p>-->
+          <!--              <i class="xi-2x xi-tab"></i>-->
+          <!--            </button>-->
+          <!--          </div>-->
+        </div>
+      </div>
+      <div class="modals">
+        <div class="user-stack3-modal">
+          <div
+            aria-hidden="true"
+            class="modal fade"
+            id="liked-board-modal"
+            tabindex="-1"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content liked-board-modal">
+                <div class="modal-header">
+                  <h5 class="modal-title">찜 목록</h5>
+                  <button
+                    aria-label="Close"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    type="button"
+                  ></button>
+                </div>
+                <div class="modal-body" id="likedBoardsList">
+                  <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    class="btn btn-primary"
+                    data-bs-dismiss="modal"
+                    type="button"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div
+            aria-hidden="true"
+            class="modal fade"
+            id="posted-board-modal"
+            tabindex="-1"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content posted-board-modal">
+                <div class="modal-header">
+                  <h5 class="modal-title">판매 내역</h5>
+                  <button
+                    aria-label="Close"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    type="button"
+                  ></button>
+                </div>
+                <div class="modal-body" id="PostedBoardsList">
+                  <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                  <button
+                    class="btn btn-primary"
+                    data-bs-dismiss="modal"
+                    type="button"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 성공 모달 -->
+        <div class="modal fade" id="successModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>Profile updated successfully.</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  class="btn btn-primary"
+                  data-bs-dismiss="modal"
+                  type="button"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 오류 모달 -->
+        <div class="modal fade" id="errorModal" tabindex="-1">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-body">
+                <p>비밀번호 변경 중 오류가 발생했습니다.</p>
+              </div>
+              <div class="modal-footer">
+                <button
+                  class="btn btn-primary"
+                  data-bs-dismiss="modal"
+                  type="button"
+                >
+                  확인
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script th:inline="javascript">
+        // API URL 설정
+        function loadLikedBoards() {
+          var userEmail = $("#userEmail").text();
+          $.ajax({
+            url: "/profile/liked-boards",
+            method: "GET",
+            data: { userEmail: userEmail },
+            success: function (data) {
+              var tbody = $("#likedBoardsList");
+              tbody.empty(); // Clear existing data
+              data.forEach(function (board) {
+                var row = `<a class='liked-board-item' href='/board/view?id=${board.id}'>
+<div class='status-${board.status}'>거래 완료</div>
+            <div class='liked-board-img'>
+                <img src='${board.filepath}' onerror='this.onerror=null; this.src="/files/default.png";'>
+            </div>
+            <div class='liked-board-info'>
+                <div class='liked-board-title'>${board.title}</div>
+                <div class='liked-board-writer'>${board.user.nickname}님</div>
+                <div class='liked-board-id'></div>
+            </div>
+        </a>`;
+                tbody.append(row);
+              });
+            },
+            error: function (error) {
+              console.log("Error:", error);
+            },
+          });
+        }
+        function loadPostedBoards() {
+          var userId = $("#userId").text();
+
+          $.ajax({
+            url: `/profile/posted-boards`,
+            method: "GET",
+            data: { userId: userId },
+            success: function (data) {
+              var tbody = $("#PostedBoardsList");
+              tbody.empty(); // Clear existing data
+              data.forEach(function (board) {
+                var statusText;
+                if (board.status == 1) {
+                  statusText = "거래 가능";
+                } else if (board.status == 2) {
+                  statusText = "거래 진행중";
+                } else if (board.status == 3) {
+                  statusText = "거래 완료";
+                } else {
+                  statusText = "";
+                }
+                var modifiedTimeAgo;
+                if (board.modifiedTimeAgo == "null") {
+                  modifiedTimeAgo = "";
+                } else {
+                  modifiedTimeAgo = "마지막 수정: " + board.modifiedTimeAgo;
+                }
+
+                var row = `
+		
+			<a class='posted-board-item' href='/board/view?id=${board.id}'>
+			<div class='status-${board.status}'>거래 완료</div>
+                <div class='posted-board-img'>
+                    <img src='${board.filepath}' onerror='this.onerror=null; this.src="/files/default.png";'>
+                </div>
+                <div class='posted-board-info'>
+                    <div class='posted-board-title'>${board.title}</div>
+                    <div class='posted-board-price'>${board.formattedPrice}원</div>
+                    <div class='posted-board-date'>${board.createDateFormatted}</div>
+                    <div class='posted-board-date'>${modifiedTimeAgo}</div>
+                    <div class='posted-board-status'>${statusText}</div>
+                </div>
+                
+            </a>
+        `;
+                tbody.append(row);
+              });
+            },
+            error: function (error) {
+              console.log("Error:", error);
+            },
+          });
+        }
+
+        // 프로필 변경 팝업
+        $(document).ready(function () {
+          $("#nickname-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            const nickname = $("#nickname").val();
+
+            $.ajax({
+              type: "POST",
+              url: "/mypage/change-nickname",
+              data: { nickname: nickname },
+              success: function () {
+                $("#nickname-modify-modal").modal("hide");
+                $("#nicknameDisplay").text(nickname);
+
+                $("#successModal").modal("show"); // 성공 모달 표시
+              },
+              error: function () {
+                $("#nickname-modify-modal").modal("hide");
+
+                $("#errorModal").modal("show"); // 오류 모달 표시
+                $("#errorModal .modal-content p").text(
+                  "닉네임 변경 중 오류가 발생했습니다.",
+                );
+              },
+            });
+          });
+          $("#password-change-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            $.ajax({
+              type: "GET",
+              url: "/mypage/is-social-login",
+              success: function (isSocialLogin) {
+                if (isSocialLogin) {
+                  $("#errorModal .modal-content p").text(
+                    "소셜 로그인 계정은 비밀번호를 변경할 수 없습니다.",
+                  );
+                  $("#errorModal").modal("show");
+                } else {
+                  // 소셜 로그인 사용자가 아니면 비밀번호 변경 요청 진행
+                  const currentPassword = $("#current-password").val();
+                  const newPassword = $("#new-password").val();
+                  const confirmPassword = $("#confirm-password").val();
+
+                  if (newPassword !== confirmPassword) {
+                    alert("새 비밀번호가 일치하지 않습니다.");
+                    return;
+                  }
+
+                  $.ajax({
+                    type: "POST",
+                    url: "/mypage/change-password",
+                    data: JSON.stringify({
+                      currentPassword: currentPassword,
+                      newPassword: newPassword,
+                    }),
+                    contentType: "application/json",
+                    success: function () {
+                      $("#password-modify-modal").modal("hide");
+                      $("#successModal").modal("show"); // 성공 모달 표시
+                    },
+                    error: function (xhr, status, error) {
+                      $("#password-modify-modal").modal("hide");
+                      $("#errorModal .modal-content p").text(
+                        "오류가 발생했습니다: " + xhr.responseText,
+                      );
+                      $("#errorModal").modal("show"); // 오류 모달 표시
+                    },
+                  });
+                }
+              },
+              error: function () {
+                $("#errorModal .modal-content p").text(
+                  "소셜 로그인 상태를 확인하는 중 오류가 발생했습니다.",
+                );
+                $("#errorModal").modal("show");
+              },
+            });
+          });
+          $("#name-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            const name = $("#name").val();
+
+            $.ajax({
+              type: "POST",
+              url: "/mypage/change-name",
+              data: { name: name },
+              success: function () {
+                $("#successModal").modal("show"); // 모달 표시
+                $("#nameDisplay").text(name);
+
+                setTimeout(function () {
+                  $("#successModal").modal("hide");
+                }, 1000);
+              },
+              error: function () {
+                alert("이름 변경 중 오류가 발생했습니다.");
+              },
+            });
+          });
+          $("#profile-photo-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            var formData = new FormData();
+            formData.append("file", $("#profile-photo")[0].files[0]); // 파일 업로드 부분
+
+            $.ajax({
+              type: "POST",
+              url: "/mypage/change-profilepic",
+              data: formData,
+              processData: false,
+              contentType: false,
+              success: function (response) {
+                $("#profile-photo-modify-modal").modal("hide");
+                $("#successModal .modal-content p").text(response); // 성공 메시지 표시
+                $("#successModal").modal("show");
+              },
+              error: function (xhr, status, error) {
+                $("#profile-photo-modify-modal").modal("hide");
+                $("#errorModal .modal-content p").text(xhr.responseText); // 오류 메시지 표시
+                $("#errorModal").modal("show");
+              },
+            });
+          });
+          $("#birthdate-form").submit(function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작을 막음
+
+            const birthdate = $("#birthdate").val();
+
+            $.ajax({
+              type: "POST",
+              url: "/mypage/change-birthdate",
+              data: { birthdate: birthdate },
+              success: function () {
+                $("#successModal").modal("show"); // 모달 표시
+                $("#birthdateDisplay").text(birthdate);
+
+                setTimeout(function () {
+                  $("#successModal").modal("hide");
+                }, 1000);
+              },
+              error: function () {
+                alert("생년월일 변경 중 오류가 발생했습니다.");
+              },
+            });
+          });
+          $("#showLikedBoards").click(function () {
+            loadLikedBoards();
+          });
+          $("#showPostedBoards").click(function () {
+            loadPostedBoards();
+          });
+        });
+
+        // 성공 모달의 확인 버튼 클릭 시 모달 닫기
+        $("#successModal .btn-primary").click(function () {
+          $("#successModal").modal("hide");
+        });
+
+        // 오류 모달의 확인 버튼 클릭 시 모달 닫기
+        $("#errorModal .btn-primary").click(function () {
+          $("#errorModal").modal("hide");
+        });
+
+        // 성공 모달이 숨겨질 때 페이지 새로고침
+        $("#successModal").on("hidden.bs.modal", function () {
+          location.reload();
+        });
+
+        // 오류 모달이 숨겨질 때 페이지 새로고침
+        $("#errorModal").on("hidden.bs.modal", function () {
+          location.reload();
+        });
+      </script>
+    </div>
+  </body>
+</html>

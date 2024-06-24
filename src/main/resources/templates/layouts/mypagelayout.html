@@ -16,41 +16,23 @@
     <th:block layout:fragment="css"></th:block>
 
     <style>
-      body {
-        align-items: stretch;
-        background-color: rgb(255, 255, 255);
-        display: flex;
-        flex-direction: column;
-
-        justify-content: flex-start;
-        left: 0;
-        margin: unset;
-        min-height: 100%;
-
-        overflow: hidden auto;
-        position: absolute;
-        /* 👇넘치는 부분은 보여지지 않고 스크롤로 내릴 수 있음 */
-        top: 0;
-        width: 100%;
-      }
-
       .container {
         display: grid;
-        grid-column-gap: 40px;
+        grid-column-gap: 10px;
         grid-row-gap: 0px;
         grid-template-columns: 0.3fr 1fr;
         grid-template-rows: 1fr;
         margin-top: 10px;
         padding: 10px;
-        width: 1200px;
       }
 
       .sidemenu {
         width: 250px;
       }
+
       .side-title {
         align-items: center;
-        background-color: #0d6efd;
+        background-color: #20b626;
         border-top-left-radius: 0.25rem;
         border-top-right-radius: 0.25rem;
         color: rgb(255, 255, 255);
@@ -58,6 +40,14 @@
         height: 100px;
         justify-content: center;
       }
+
+      .list-group-item.active {
+        background-color: #20b626;
+        border-color: #20b626;
+        color: #fff;
+        z-index: 2;
+      }
+
       .list-group-item:first-child {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
@@ -66,48 +56,65 @@
       .content {
         grid-area: 1 / 2 / 2 / 3;
       }
+
+      @media screen and (max-width: 500px) {
+        .sidemenu {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
-    <div th:replace="~{fragments/header::header}"></div>
+    <div id="wof">
+      <div th:replace="~{fragments/header::header}"></div>
 
-    <div class="main-content">
-      <div class="container">
-        <div class="sidemenu-container">
-          <div class="sidemenu">
-            <div class="side-title">
-              <h5>마이 페이지</h5>
-            </div>
-            <div class="list-group sidemenu-list">
-              <a
-                class="list-group-item list-group-item-action sidemenu-tab"
-                href="/mypage"
-                >내 정보 수정</a
-              >
-              <a
-                class="list-group-item list-group-item-action sidemenu-tab"
-                href="/chat"
-                >내 채팅</a
-              >
-              <a
-                class="list-group-item list-group-item-action sidemenu-tab"
-                href="/noti"
-                >키워드 알림</a
-              >
-              <a
-                class="list-group-item list-group-item-action sidemenu-tab"
-                href="#"
-                >문의</a
-              >
-              <a
-                      class="list-group-item list-group-item-action sidemenu-tab"
-                      href="/admin/user-list"
-              >관리자 페이지</a
-              >
+      <div class="main-content">
+        <div class="container">
+          <div class="sidemenu-container">
+            <div class="sidemenu">
+              <div class="side-title">
+                <h5>마이 페이지</h5>
+              </div>
+              <div class="list-group sidemenu-list">
+                <a
+                  class="list-group-item list-group-item-action sidemenu-tab"
+                  href="/mypage"
+                  >내 정보</a
+                >
+                <a
+                  class="list-group-item list-group-item-action sidemenu-tab"
+                  href="/chat"
+                  >내 채팅</a
+                >
+                <a
+                  class="list-group-item list-group-item-action sidemenu-tab"
+                  href="/noti"
+                  >키워드 알림</a
+                >
+                <a
+                  class="list-group-item list-group-item-action sidemenu-tab"
+                  href="/qna"
+                  >자주 하는 질문</a
+                >
+                <th:block
+                  th:if="${#authentication.principal.role}=='ROLE_ADMIN'"
+                >
+                  <a
+                    class="list-group-item list-group-item-action sidemenu-tab"
+                    href="/admin/user-list"
+                    >관리자 페이지</a
+                  >
+                  <a
+                          class="list-group-item list-group-item-action sidemenu-tab"
+                          href="/qna"
+                  >문의</a
+                  >
+                </th:block>
+              </div>
             </div>
           </div>
+          <div class="content" layout:fragment="content"></div>
         </div>
-        <div class="content" layout:fragment="content"></div>
       </div>
     </div>
 
@@ -139,7 +146,11 @@
         document
           .querySelector(".sidemenu-tab:nth-child(3)")
           .classList.add("active");
-      } else {
+      }else if (currentPath.includes("qna")) {
+        document
+          .querySelector(".sidemenu-tab:nth-child(4)")
+          .classList.add("active");
+      } else { else {
         document
           .querySelector(".nav_btn_badge:first-child")
           .classList.add("active");

@@ -14,15 +14,25 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @RequiredArgsConstructor
 @Configuration
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     private final PrincipalOauth2UserService principalOauth2UserService;
     private final CustomUserDetailsService customUserDetailsService;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:/home/ec2-user/pepper/files/");
+        registry.addResourceHandler("/profile/**")
+                .addResourceLocations("file:/home/ec2-user/pepper/files/profile/");
+    }
 
     @Bean
     public WebSecurityCustomizer configure() {
@@ -39,8 +49,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
                         .requestMatchers("/", "/login", "/signup", "/user", "/board/list", "/board/view/**", "/main", "/layout", "/img/**", "/css/**", "/js/**", "/username", "/files/**", "/notifications", "/board/like/count").permitAll()
+                        .requestMatchers("/profile/update").authenticated()
                         .requestMatchers("/mypage/**").authenticated()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/chat/**").authenticated()
                         .anyRequest().authenticated()
                 )

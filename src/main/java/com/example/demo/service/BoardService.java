@@ -1,29 +1,29 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Keyword;
-import com.example.demo.entity.Notification;
-import com.example.demo.entity.Users;
-import com.example.demo.entity.Board;
+import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service // 서비스 클래스임을 나타냄
 public abstract class BoardService {
@@ -32,6 +32,9 @@ public abstract class BoardService {
 
     @Autowired
     private BoardRepository boardRepository;
+
+    @Autowired
+    private ReportRepository reportRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -53,13 +56,11 @@ public abstract class BoardService {
 
     @Autowired
     private LikeService likeService;
-    
-//    @Value("${file.upload-dir}")
-//    private String uploadDir;
-
 
     @Value("${file.upload-dir}")
     private String uploadDir;
+
+
     @Autowired
     public BoardService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -74,16 +75,21 @@ public abstract class BoardService {
 
         // 게시글에 사용자 정보와 작성 시간을 설정
         board.setUser(user);
-        board.setCreateDate(LocalDateTime.now());
-
+//        if(board.getCreateDate() == null) {
+//            board.setCreateDate(LocalDateTime.now());
+//        }else{
+//            board.setModifyDate(LocalDateTime.now());
+//        }
+        board.setLikecount(0);
         try {
             // 파일이 비어있지 않으면 파일을 저장
             if (!file.isEmpty()) {
-                String projectPath = System.getProperty("user.dir") + "\\src\\main\\resources\\static\\files";
+                String savePath = "/home/ec2-user/pepper/files/";
                 UUID uuid = UUID.randomUUID();
                 String fileName = uuid + "_" + file.getOriginalFilename();
-                Path filePath = Paths.get(uploadDir, fileName);
-                file.transferTo(filePath.toFile());
+                File saveFile = new File(savePath, fileName);
+                logger.info("파일 저장 경로: " + saveFile.getPath());
+                file.transferTo(saveFile);
                 board.setFilename(fileName);
                 board.setFilepath("/files/" + fileName);
                 logger.info("파일 업로드 성공: " + fileName);
@@ -94,17 +100,15 @@ public abstract class BoardService {
             logger.info("게시글 저장 성공: " + savedBoard.getId());
             return savedBoard;
         } catch (Exception e) {
-            logger.error("파일 업로드 중 오류 발생", e);
-            throw new Exception("파일 업로드 중 오류가 발생했습니다.");
+            throw new Exception("파일 업로드 중 오류가 발생했습니다.", e);
         }
     }
-
     // 페이징을 지원하는 모든 게시글 리스트를 가져오는 메서드
     public Page<Board> boardList(Pageable pageable) {
         return boardRepository.findAll(pageable);
     }
-    
-    
+
+
     // 특정 키워드를 포함하는 게시글 리스트를 페이징하여 가져오는 메서드
     public Page<Board> boardSearchListAvailable(String searchKeyword, Pageable pageable, Integer status) {
         return boardRepository.findByTitleContainingAndStatusNot(searchKeyword, pageable, status);
@@ -128,7 +132,7 @@ public abstract class BoardService {
             commentRepository.deleteByBoardId(id);
             likeRepository.deleteByBoardId(id);
             notificationRepository.deleteByBoardId(id);
-
+            reportRepository.deleteByReportedPostId(id);
             // 게시글 삭제
             boardRepository.deleteById(id);
         } catch (Exception e) {
@@ -195,6 +199,7 @@ public abstract class BoardService {
     public List<Board> getPostsByViewcount() {
         return boardRepository.findByOrderByViewcountDesc();
     }
+    public List<Board> getPostsByLiked(){return boardRepository.findByOrderByLikecountDesc();}
 
     // 조회수가 높은 상위 10개의 게시글을 가져오는 메서드
     public List<Board> getTop10PostsByViewcount() {
@@ -224,6 +229,11 @@ public abstract class BoardService {
         return boardRepository.findByStatusNotOrderByCreateDateDesc(3, pageable);
     }
 
+    public String findAuthorEmailByPostId(Long postId) {
+        Board post = boardRepository.findById(Math.toIntExact(postId)).orElseThrow(() -> new IllegalArgumentException("잘못된 게시글 ID입니다."));
+        return post.getUser().getEmail(); // 작성자가 Users 엔티티로서 이메일 필드를 가지고 있다고 가정
+    }
+
 
     
 
@@ -232,9 +242,38 @@ public abstract class BoardService {
         boardRepository.incrementLikes(id);
     }
 
-    public Page<Board> searchBoards(String searchKeyword, Integer searchCateID, Pageable pageable, boolean showCompleted, UserDetails userDetails) {
+    public Page<Board> searchBoards(String searchKeyword, Integer searchCateID,
+                                    Pageable pageable, boolean showCompleted,
+                                    UserDetails userDetails, String sortBy, String direction) {
         Integer status = showCompleted ? null : 3; // showCompleted가 true이면 status를 null로 설정하여 모든 상태의 게시글을 가져옴
-        Page<Board> boards = boardRepository.searchBoards(searchKeyword, searchCateID, status, pageable);
+
+
+        // 기본 정렬 기준 설정
+        Sort defaultSort = Sort.by(Sort.Direction.DESC, "createDate");
+
+        // 사용자가 선택한 정렬 기준에 따라 정렬 방식 설정
+        if ("likecount".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.fromString(direction), "likecount", "createDate");
+        } else if ("viewcount".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.fromString(direction), "viewcount", "createDate");
+        } else if ("priceASC".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.ASC, "price");
+        } else if ("priceDESC".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.DESC, "price");
+        }else if ("createDateAsc".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.ASC, "createDate", "createDate");
+        } else if ("createDate".equals(sortBy)) {
+            defaultSort = Sort.by(Sort.Direction.DESC, "createDate", "createDate");
+        }
+
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), defaultSort);
+
+        // 검색 키워드에 와일드카드 추가
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            searchKeyword = "%" + searchKeyword + "%";
+        }
+
+        Page<Board> boards = boardRepository.searchBoards(searchKeyword, searchCateID, status, sortedPageable);
         
         String username = userDetails != null ? userDetails.getUsername() : null;
         
@@ -245,6 +284,8 @@ public abstract class BoardService {
         
         return boards;
     }
+
+
 
     public Board getBoardById(Long postId) {
         return boardRepository.findById(Math.toIntExact(postId))
@@ -260,4 +301,8 @@ public abstract class BoardService {
     public Page<Board> getBoardByUserId(Long userId, Pageable pageable) {
         return boardRepository.findByUserId(userId, pageable);
     }
+    public List<Board> getBoardByUserId(Long userId){
+        return boardRepository.findByUserIdOrderByCreateDateDesc(userId);
+    }
+    
 }

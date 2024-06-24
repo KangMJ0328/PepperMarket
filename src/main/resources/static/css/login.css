@@ -1,8 +1,9 @@
 * {
   box-sizing: border-box;
-  font-family: DungGeunMo;
+  font-family: "Noto Sans KR", sans-serif;
   font-size: 15px;
-  font-weight: normal;
+  font-style: normal;
+  font-weight: 400;
 }
 
 body,

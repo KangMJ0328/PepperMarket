@@ -1,38 +1,20 @@
-/*// <uniquifier>: Use a unique and descriptive class name*/
-/*// <weight>: Use a value from 100 to 900*/
-
-/*.noto-sans-kr-<uniquifier > {*/
-/*  font-family: "Noto Sans KR", sans-serif;*/
-/*  font-optical-sizing: auto;*/
-/*  font-weight: <weight>;*/
-/*  font-style: normal;*/
-/*}*/
-
-* {
-  box-sizing: border-box;
-  /* font-family: "Noto Sans KR", sans-serif; */
-  margin: 0;
-  padding: 0;
-}
-
 .main-banner {
+  height: 500px;
 }
-
-.category-popular,
-.categories {
-  margin: 40px auto;
+.container {
+  background: none;
+}
+.header-underline {
+  display: none;
+}
+footer {
+  background: url("../img/back_ani/footer_back_img.png");
+}
+.category-popular {
+  margin: 150px auto 0;
   max-width: 1200px;
   overflow: hidden;
   position: relative;
-}
-
-.category-popular .swiper-slide img,
-.categories .swiper-slide img {
-  height: 400px;
-  object-fit: cover;
-  position: relative;
-  width: 250px;
-  /* This ensures the image covers the container */
 }
 
 .pop > a > span {
@@ -52,4 +34,8 @@
   height: 200px;
   margin: 50px auto;
   width: 200px;
+}
+
+.more {
+  margin: 0 auto;
 }

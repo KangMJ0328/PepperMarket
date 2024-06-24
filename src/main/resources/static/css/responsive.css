@@ -1,0 +1,29 @@
+@media screen and (max-width: 500px) {
+  #wof {
+    margin: 0 auto;
+    width: 100%;
+  }
+  .header-wrapper {
+    width: 100%;
+  }
+  .header-box {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 1500px) {
+  .sidemenu {
+    display: none;
+  }
+}
+@media screen and (min-width: 1080px) {
+  #wof {
+    margin: 0 auto;
+    width: 100%;
+  }
+  .header-wrapper {
+    width: 100%;
+  }
+  .header-box {
+    width: 100%;
+  }
+}

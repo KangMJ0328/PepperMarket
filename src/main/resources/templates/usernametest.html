@@ -8,6 +8,7 @@
     <title>Title</title>
   </head>
   <body>
+    <p th:text="${#authentication}"></p>
     <p th:text="${#authentication.name}"></p>
     <p th:text="${#authentication.authorities}"></p>
     <p th:text="${#authentication.authenticated}"></p>

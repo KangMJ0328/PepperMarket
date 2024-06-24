@@ -40,9 +40,10 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
-        return Stream.of(new SimpleGrantedAuthority(users.getRole().getAuthority()))
-                .collect(Collectors.toList());
+        return Stream.of(
+                new SimpleGrantedAuthority(users.getRole().getAuthority()),
+                new SimpleGrantedAuthority("user")
+        ).collect(Collectors.toList());
     }
 
     @Override
@@ -89,11 +90,12 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
         return attributes;
     }
 
+
     public String getProfilePic() {
-        return (String) attributes.get("profile_picture_url");
+        return users.getProfilePicPath();
     }
 
-    public String getPPic() {
-        return users.getProfilePictureUrl();
+    public String getRole() {
+        return users.getRole().getAuthority();
     }
 }

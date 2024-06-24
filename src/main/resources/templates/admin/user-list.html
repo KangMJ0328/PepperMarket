@@ -54,13 +54,11 @@
             background-color: #dc3545;
             border-color: #dc3545;
         }
-
     </style>
 </head>
 <body>
 <div class="container">
     <h2>사용자 목록</h2>
-    <a class="main" href="/">메인페이지</a>
     <table class="table">
         <thead>
         <tr>
@@ -78,16 +76,39 @@
             <td th:text="${user.nickname}">nickname</td>
             <td th:text="${user.suspended ? '예' : '아니오'}">아니오</td>
             <td>
-                <form method="post" th:action="@{/admin/suspend/{userId}(userId=${user.id})}" th:if="${!user.suspended}">
-                    <button class="btn btn-danger" type="submit">정지</button>
+                <form th:action="@{/admin/suspend/{userId}(userId=${user.id})}" method="post" th:if="${!user.suspended}">
+                    <button type="submit" class="btn btn-danger">정지</button>
                 </form>
-                <form method="post" th:action="@{/admin/unsuspend/{userId}(userId=${user.id})}" th:if="${user.suspended}">
-                    <button class="btn btn-primary" type="submit">정지 해제</button>
+                <form th:action="@{/admin/unsuspend/{userId}(userId=${user.id})}" method="post" th:if="${user.suspended}">
+                    <button type="submit" class="btn btn-primary">정지 해제</button>
                 </form>
             </td>
         </tr>
         </tbody>
     </table>
+
+    <h2>신고 목록</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>신고자 이메일</th>
+            <th>신고 대상자 이메일</th>
+            <th>사유</th>
+            <th>바로가기</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="report : ${reports}">
+            <td th:text="${report.reporterEmail}">신고자 이메일</td>
+            <td th:text="${report.reportedEmail}">신고 대상자 이메일</td>
+            <td th:text="${report.reason}">사유</td>
+            <td>
+                <a th:href="@{'/board/view?id=' + ${report.reportedPost.id}}">신고된 게시물로 가기</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+<a href="/">홈으로 가기</a>
 </body>
 </html>

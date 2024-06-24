@@ -6,14 +6,91 @@
 >
 <th:block layout:fragment="css">
 	<link rel="stylesheet" th:href="@{/css/main.css}"/>
+	<link rel="stylesheet" th:href="@{/css/main_ani.css}"/>
 	<link rel="stylesheet" th:href="@{/css/boardcategories.css}"/>
 </th:block>
 <div layout:fragment="content">
+	<div class="main-ani-back">
+		<div class="main_back">
+			<img alt="집" class="main_home" src="img/back_ani/home.png">
 
-	<div class="main-content">
-		<div class="main-banner">
-			<img th:src="@{/img/banner.png}"/>
+			<!-- kang -->
+			<div class="kang-ani">
+				<img alt="강" class="kang" src="img/back_ani/kang.png">
+				<img alt="망치" class="hammer" src="img/back_ani/hammer.png">
+				<img alt="마을표지판" class="village_sign" src="img/back_ani/village_sign.png">
+			</div>
+
+			<!-- kim -->
+			<div class="kim-ani">
+				<img alt="김" class="kim" src="img/back_ani/kim.png">
+				<img alt="쟁기" class="plow" src="img/back_ani/plow.png">
+				<img alt="흙" class="soil_1" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_2" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_3" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_4" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_5" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_6" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_7" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_8" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_9" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_10" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_11" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_12" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_13" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_14" src="img/back_ani/soil.png">
+				<img alt="흙" class="soil_15" src="img/back_ani/soil.png">
+			</div>
+
+			<!-- shin -->
+			<div class="shin-ani">
+				<img alt="신" class="shin" src="img/back_ani/shin.png">
+				<img alt="수도꼭지" class="water_tap2" src="img/back_ani/water_tap2.png">
+				<img alt="물2" class="water2" src="img/back_ani/water2.png">
+				<img alt="물1" class="water" src="img/back_ani/water.png">
+				<img alt="물놀이" class="water_play" src="img/back_ani/water_play.png">
+				<img alt="백조" class="swan" src="img/back_ani/swan.png">
+				<img alt="물고기1" class="fish" src="img/back_ani/fish.png">
+				<img alt="물고기2" class="fish2" src="img/back_ani/fish2.png">
+				<img alt="거북이" class="turtle" src="img/back_ani/turtle.png">
+				<img alt="상어" class="shark" src="img/back_ani/shark.png">
+				<img alt="고추풀" class="spicy_baby" src="img/back_ani/spicy2.png">
+			</div>
+
+			<!-- moon -->
+			<div class="moon-ani">
+				<img alt="moon" class="moon" src="img/back_ani/Moon.png">
+				<!-- ani -->
+				<img alt="고추나무" class="pepper_tree1" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree2" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree3" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree4" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree5" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree6" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree7" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree8" src="img/back_ani/pepper_tree.png">
+				<!-- non -->
+				<img alt="고추나무" class="pepper_tree9" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree10" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree11" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree12" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree13" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree14" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree15" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree16" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree17" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree18" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree19" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree20" src="img/back_ani/pepper_tree.png">
+				<img alt="고추나무" class="pepper_tree21" src="img/back_ani/pepper_tree.png">
+				<!-- 메인 뒷 배경 -->
+
+				<!-- Product Section -->
+			</div>
 		</div>
+	</div>
+	<div class="container">
+		<div class="main-banner"></div>
 		<div class="category-popular">
 			<h2>최근 올라온 상품들</h2>
 			<div class="product-album py-5 bg-light">
@@ -51,8 +128,10 @@
 											<button
 												class="btn btn-sm btn-outline-secondary edit-button"
 												type="button"
-											><a th:href="@{/board/modify/{id}(id=${board.id})}">Edit</a>
-
+											>
+												<a th:href="@{/board/modify/{id}(id=${board.id})}"
+												>Edit</a
+												>
 											</button>
 										</th:block>
 										<th:block th:if="${board.writer !=  loggedUserId}">
@@ -65,7 +144,8 @@
 											</button>
 										</th:block>
 										<small
-											class="text-muted" th:text="${board.timeAgo}"
+											class="text-muted"
+											th:text="${board.getCreateDateFormatted()}"
 										>timeago</small
 										>
 									</div>
@@ -73,12 +153,18 @@
 							</div>
 						</div>
 					</div>
-					<button class="btn btn-primary" onclick="location.href='/board/list'" type="button">더 많은 상품
-						보기
+					<button
+						class="btn btn-primary more"
+						onclick="location.href='/board/list'"
+						type="button"
+					>
+						더 많은 상품 보기
 					</button>
 				</div>
 			</div>
 		</div>
+
 	</div>
 </div>
+
 </html>

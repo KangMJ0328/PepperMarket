@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class ReportRequest {
     private Long boardId;
+    private Long postId;
     private String reason;
 }

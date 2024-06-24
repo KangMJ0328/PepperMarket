@@ -1,0 +1,110 @@
+* {
+    list-style: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+/* pagenation */
+.pagenation {
+    padding: 20px 0 0 0;
+    font-size: 12px;
+    text-align: center;
+}
+
+.pagenation li {
+    display: inline;
+    padding: 7px 0;
+    border: 1px solid #b6b6b6;
+    margin: 0 3px;
+}
+
+.pagenation li a {
+    color: #424242;
+    padding: 0px 10px;
+}
+
+.pagenation li a img {
+    vertical-align: middle;
+}
+
+.pagenation li:hover {
+    background: #f8f8f8;
+}
+
+.pagenation li.on {
+    background: #777777;
+    border: 1px solid #777777;
+}
+
+.pagenation li.on a {
+    color: #ffffff;
+}
+
+
+.faq {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.faq ul {
+    margin-bottom: 80px !important;
+}
+
+.faq ul li:last-child {
+    border-bottom: 1px solid #b7b7b7;
+}
+
+.article .text {
+    padding: 40px 35px;
+    font-size: 16px;
+    display: none;
+    border-top: 1px solid #b7b7b7;
+    padding: 40px 0;
+}
+
+.new_qa {
+    width: 900px;
+    height: 80px;
+    background-color: #f6f6f6;
+    border-top: 1px solid #b7b7b7;
+    /* padding: 20px 15px; */
+    font-size: 20px;
+    color: #333;
+    background-image: url(../img/shark.png);
+    background-position: 97% 50%;
+    background-repeat: no-repeat;
+    cursor: pointer;
+}
+
+.new_qa.on {
+    background-image: url(../img/swan.png)
+}
+
+.new_qa>span.sbsb {
+    margin-left: 70px;
+        /* margin-bottom: auto; */
+        position: relative;
+        bottom: 35px;
+        left: 10px;
+    }
+}
+
+.article .a {
+    position: relative;
+    display: none;
+}
+
+#bo_list .tbl_head01 {
+    width: 900px;
+}
+
+.qa_img {
+    width: 60px;
+    height: 60px;
+    position: relative;
+    top: 10px;
+    left: 10px;
+}
+

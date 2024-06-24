@@ -11,111 +11,181 @@
     ></script>
   </th:block>
   <script th:inline="javascript" sec:authorize="isAuthenticated()">
-    // API URL 설정
     const NOTIFICATION_API_URL = "/notifications";
+    const API_BASE_URL = "/keywords";
+    const MESSAGE_API_URL = "/messages";
 
-    // 알림 목록 불러오기 함수
-    function loadNotiPop() {
-        const userId = /*[[${#authentication.principal.id}]]*/ "anonymous"; // 로그인한 사용자의 ID
-        console.log("사용자 ID의 알림 로딩 중:", userId); // 디버깅 로그 추가
+    function loadNotifications() {
+      const userId = /*[[${#authentication.principal.id}]]*/ "anonymous";
+      console.log("사용자 ID의 알림 로딩 중:", userId);
 
       $.ajax({
         type: "GET",
         url: `${NOTIFICATION_API_URL}?userId=${userId}`,
         success: function (notifications) {
-          console.log("알림 가져옴:", notifications); // 디버깅 로그 추가
+          console.log("알림 가져옴:", notifications);
 
-                const notificationListPop = $("#noti-pop-content");
-                const unreadCountElement = $("#unread-count");
-                const unreadCountBadge = $("#noti-count");
+          const notificationList = $("#notification-list");
+          const notificationListPop = $("#noti-pop-content");
+          const unreadCountElement = $("#unread-count");
+          const unreadCountBadge = $("#noti-count");
 
-                notificationListPop.empty();
+          notificationListPop.empty();
+          notificationList.empty();
 
-                let unreadCount = 0;
+          let unreadCount = 0;
 
-                notifications.forEach((notification) => {
-                    const notificationClass = notification.read
-                        ? "read-notification"
-                        : "";
-                    if (!notification.read) {
-                        unreadCount++;
-                    }
+          notifications.forEach((notification) => {
+            const notificationClass = notification.read
+              ? "read-notification"
+              : " ";
+            if (!notification.read) {
+              unreadCount++;
+            }
 
-                    notificationListPop.append(
-                        `
-    			                <li class="${notificationClass}">
-    			                <a href="/board/view?id=${notification.board.id}" onclick="markAsRead(${notification.id})">
-    			                ${notification.message}</a>
-    			                <i class="fas fa-times delete-icon fa-lg btn-icon delete-noti" onclick="deleteNoti(${notification.id})"></i>
-    			                </li>
-                          `,
-                    );
-                });
-                // 안 읽은 알림 개수 업데이트
-                if (unreadCount === 0) {
-                    unreadCountElement.text("모든 알림을 읽었습니다");
-                    unreadCountBadge.hide();
-                } else {
-                    unreadCountElement.text(`안 읽은 알림: ${unreadCount}`);
-                    unreadCountBadge.text(unreadCount);
-                    unreadCountBadge.show();
-                }
-            },
-            error: function (error) {
-                console.error("알림 목록 불러오기 중 오류 발생:", error);
-            },
-        });
+            let link = "/";
+            if (notification.board) {
+              link = `/board/view?id=${notification.board.id}`;
+            } else if (notification.chatMessage) {
+              link = `/chat/room/${notification.chatMessage.chatRoomId}?receiverId=${notification.chatMessage.receiver.id}`; // 수정: 채팅방으로 이동하는 링크
+            }
+
+            notificationList.append(
+              `<li class="${notificationClass}">
+              <a href="${link} "   onclick="markAsRead(${notification.id})"> ${notification.message} </a>
+              <button onclick="markAsReadToggle(${notification.id})">읽음 표시</button>
+              <i class="far fa-trash-alt delete-icon fa-lg btn-icon delete-noti" onclick="deleteNoti(${notification.id})"></i>
+            </li>`,
+            );
+
+            notificationListPop.append(
+              `<li class="${notificationClass}">
+              <a href="${link}" onclick="markAsRead(${notification.id})">${notification.message}</a>
+              <i class="fas fa-times delete-icon fa-lg btn-icon delete-noti" onclick="deleteNoti(${notification.id})"></i>
+            </li>`,
+            );
+          });
+
+          if (unreadCount === 0) {
+            unreadCountElement.text("모든 알림을 읽었습니다");
+            unreadCountBadge.hide();
+          } else {
+            unreadCountElement.text(`안 읽은 알림: ${unreadCount}`);
+            unreadCountBadge.text(unreadCount);
+            unreadCountBadge.show();
+          }
+        },
+        error: function (error) {
+          console.error("알림 목록 불러오기 중 오류 발생:", error);
+        },
+      });
     }
 
-    const e = document.getElementById("notificationButton");
-    const g = document.getElementById("notiPop");
-
-    e.addEventListener("click", function openNotiPop() {
-      g.style.display = g.style.display === "none" ? "" : "none";
-    });
-
-    // 알림 읽음 표시 함수
     function markAsRead(id) {
-        $.ajax({
-            type: "POST",
-            url: `${NOTIFICATION_API_URL}/${id}/read`,
-            success: function () {
-                loadNotiPop();
-            },
-            error: function (error) {
-                console.error("알림 읽음 표시 중 오류 발생:", error);
-            },
-        });
+      $.ajax({
+        type: "POST",
+        url: `${NOTIFICATION_API_URL}/${id}/read`,
+        success: function () {
+          loadNotifications();
+        },
+        error: function (error) {
+          console.error("알림 읽음 표시 중 오류 발생:", error);
+        },
+      });
     }
 
     function markAsReadToggle(id) {
-        $.ajax({
-            type: "POST",
-            url: `${NOTIFICATION_API_URL}/${id}/readtoggle`,
-            success: function () {
-                loadNotiPop();
-            },
-            error: function (error) {
-                console.error("알림 읽음 표시 중 오류 발생:", error);
-            },
-        });
+      $.ajax({
+        type: "POST",
+        url: `${NOTIFICATION_API_URL}/${id}/readtoggle`,
+        success: function () {
+          loadNotifications();
+        },
+        error: function (error) {
+          console.error("알림 읽음 표시 중 오류 발생:", error);
+        },
+      });
     }
 
     function deleteNoti(id) {
-        $.ajax({
-            type: "DELETE",
-            url: `${NOTIFICATION_API_URL}/${id}/delete`,
-            success: function () {
-                loadNotiPop();
-            },
-            error: function (error) {
-                console.error("알림 삭제 중 오류 발생:", error);
-            },
-        });
+      $.ajax({
+        type: "DELETE",
+        url: `${NOTIFICATION_API_URL}/${id}/delete`,
+        success: function () {
+          loadNotifications();
+        },
+        error: function (error) {
+          console.error("알림 삭제 중 오류 발생:", error);
+        },
+      });
+    }
+
+    // function markMessagesAsRead(roomId, receiverId) {
+    //   $.ajax({
+    //     type: "PUT",
+    //     url: `/messages/markAsReadByRoom?roomId=${roomId}&receiverId=${receiverId}`,
+    //     success: function () {
+    //       console.log("채팅방의 메시지 알림이 삭제되었습니다.");
+    //     },
+    //     error: function (error) {
+    //       console.error("메시지 알림 삭제 중 오류가 발생했습니다:", error);
+    //     },
+    //   });
+    // }
+
+    function addKeyword() {
+      const keyword = $("#new-keyword").val();
+      const userId = $("#userId").val();
+      $.ajax({
+        type: "POST",
+        url: API_BASE_URL,
+        contentType: "application/json",
+        data: JSON.stringify({ keyword: keyword, userId: userId }),
+        success: function () {
+          loadKeywords();
+          $("#new-keyword").val("");
+        },
+        error: function (error) {
+          console.error("키워드 추가 중 오류 발생:", error);
+        },
+      });
+    }
+
+    function deleteKeyword(id) {
+      $.ajax({
+        type: "DELETE",
+        url: `${API_BASE_URL}/${id}`,
+        success: function () {
+          loadKeywords();
+        },
+        error: function (error) {
+          console.error("키워드 삭제 중 오류 발생:", error);
+        },
+      });
+    }
+
+    function loadKeywords() {
+      $.ajax({
+        type: "GET",
+        url: `${API_BASE_URL}`,
+        success: function (keywords) {
+          const keywordList = $("#keyword-list");
+          keywordList.empty();
+          keywords.forEach((keyword) => {
+            keywordList.append(
+              `<div class="keyword-item">${keyword.keyword} <i class="fas fa-times delete-keyword" onclick="deleteKeyword(${keyword.id})"></i></div>`,
+            );
+          });
+        },
+        error: function (error) {
+          console.error("키워드 목록 불러오기 중 오류 발생:", error);
+        },
+      });
     }
 
     $(document).ready(function () {
-        loadNotiPop();
+      loadNotifications();
+      loadKeywords();
     });
-</script>
+  </script>
 </html>

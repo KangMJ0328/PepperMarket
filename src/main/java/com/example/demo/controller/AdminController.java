@@ -4,6 +4,7 @@ import com.example.demo.entity.UserRole;
 import com.example.demo.entity.Users;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MemberService;
+import com.example.demo.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +31,9 @@ public class AdminController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ReportService reportService;
+
     @GetMapping("/user-list")
     public String userList(@AuthenticationPrincipal UserDetails userDetails, Model model) throws Exception {
         logger.info("Attempting to access /admin/user-list");
@@ -39,6 +43,7 @@ public class AdminController {
             if (currentUser != null && UserRole.ADMIN.equals(currentUser.getRole())) {
                 List<Users> users = userRepository.findAll();
                 model.addAttribute("users", users);
+                model.addAttribute("reports", reportService.getAllReports());
                 logger.info("User List - Access granted for admin");
                 return "admin/user-list";
             } else {

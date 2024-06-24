@@ -26,24 +26,11 @@
               </div>
               <div class="category-toggle category-toggle2">
                 <div class="category-toggle-content">
-                  <span class="filtername">가격</span>
+                  <span class="filtername">필터</span>
                   <img
                     alt="화살표 아래 아이콘"
                     src="https://ccimage.hellomarket.com/img/web/search/filter/white_arrow.svg"
                   />
-                </div>
-              </div>
-              <div class="isA-box">
-                <div class="form-check is-available">
-                  <input
-                    class="form-check-input"
-                    id="showCompleted"
-                    onchange="fetchBoardListData()"
-                    type="checkbox"
-                  />
-                  <label class="form-check-label" for="showCompleted">
-                    판매 완료된 상품도 보기
-                  </label>
                 </div>
               </div>
             </div>
@@ -88,22 +75,32 @@
             </div>
           </div>
           <div class="category-list category-sublist2" style="display: none">
-            <div class="price-filter">
-              <input
-                class="min-price"
-                placeholder="최저금액"
-                type="text"
-                value=""
-              />
-              <div class="price-divider">원 부터~ &nbsp;</div>
-              <input
-                class="max-price"
-                placeholder="최고금액"
-                type="text"
-                value=""
-              />
-              <div class="price-divider">원 까지</div>
-              <button class="apply-button">적용하기</button>
+            <div class="sort-filter">
+              <div class="sort-box">
+                <label for="sortCriteria">정렬 기준:</label>
+                <select id="sortCriteria">
+                  <option value="likecount">좋아요 개수 많은 순</option>
+                  <option value="viewcount">조회수 많은 순</option>
+                  <option value="priceDESC">가격 높은 순</option>
+                  <option value="priceASC">가격 낮은 순</option>
+                  <option value="createDate" selected>최신순</option>
+                  <option value="createDateAsc">오래된 순</option>
+                </select>
+                <button onclick="fetchBoardListData()">정렬 적용</button>
+              </div>
+              <div class="isA-box">
+                <div class="form-check form-switch is-available">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="showCompleted"
+                  />
+                  <label class="form-check-label" for="showCompleted">
+                    판매 완료된 상품도 보기
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -111,23 +108,7 @@
         <div class="product-section">
           <div class="product-count">
             <div class="product-count-left">
-              <h2><span th:text="${categNow}"></span></h2>
-              <span class="count-text">
-                <!--                <span id="product-count"></span>개의 상품이 있습니다.-->
-                <span
-                  id="product-count"
-                  th:text="${list.getTotalElements()}"
-                ></span
-                >개의 상품이 있습니다.
-              </span>
-            </div>
-            <div class="recommendation">
-              <div class="recommendation-text">추천순</div>
-              <img
-                alt="정렬 아이콘"
-                class="sort-icon"
-                src="https://ccimage.hellomarket.com/img/web/search/itemList/ico_sort.png"
-              />
+              <h2 th:text="${categNow}"></h2>
             </div>
           </div>
           <div id="product-list" th:fragment="content">
@@ -170,11 +151,6 @@
                           th:text="${board.getFormattedPrice()} + '원'"
                         ></span>
 
-                        <i
-                          class="heart-icon"
-                          th:classappend="${board.liked} ? 'fas fa-heart' : 'far fa-heart'"
-                          th:style="${board.liked} ? 'color: #ff0000' : ''"
-                        ></i>
                         <div class="card-bottom">
                           <th:block th:if="${board.writer == loggedUserId}">
                             <button
@@ -205,7 +181,12 @@
 
                           <small
                             class="text-muted"
-                            th:text="${board.getTimeAgo()}"
+                            th:text="${board.getModifiedTimeAgo()}"
+                            >timeago</small
+                          >
+                          <small
+                            class="text-muted"
+                            th:text="${board.getCreateDateFormatted()}"
                             >timeago</small
                           >
                         </div>
@@ -287,7 +268,7 @@
 
           if (selectedCategory !== null) {
             selectedCategory.style.color = "red";
-            selectedCategoryTab.style.backgroundColor = "red";
+            selectedCategoryTab.style.backgroundColor = "#20b626";
             selectedCategoryTab.style.color = "white";
           }
         }
@@ -328,35 +309,55 @@
             ? ""
             : decodeURIComponent(results[1].replace(/\+/g, " "));
         }
-
         function fetchBoardListData(page) {
           var showCompleted = document.getElementById("showCompleted").checked;
           var searchKeyword = getUrlParameter("searchKeyword");
           var searchCateID = getUrlParameter("searchCateID");
+          var sortCriteria = document.getElementById("sortCriteria").value;
+
+          var sortBy;
+          var sortDirection = "DESC"; // 기본값 내림차순
+
+          if (sortCriteria === "likecount") {
+            sortBy = "likecount";
+            sortDirection = "DESC";
+          } else if (sortCriteria === "viewcount") {
+            sortBy = "viewcount";
+            sortDirection = "DESC";
+          } else if (sortCriteria === "priceASC") {
+            sortBy = "priceASC";
+            sortDirection = "ASC";
+          } else if (sortCriteria === "priceDESC") {
+            sortBy = "priceDESC";
+            sortDirection = "DESC";
+          } else if (sortCriteria === "createDateAsc") {
+            sortBy = "createDateAsc";
+            sortDirection = "ASC";
+          } else {
+            sortBy = "createDate";
+            sortDirection = "DESC"; // 최신순
+          }
 
           $.ajax({
             url: "/board/list",
             type: "GET",
             data: {
-              // showCompleted: showCompleted,
-              page: page || 0, // Use the provided page parameter or default to 0
-              ajax: true, // Ajax request indicator
+              page: page || 0, // 페이지 번호, 기본값 0
+              ajax: true, // Ajax 요청 플래그
               showCompleted: showCompleted,
               searchKeyword: searchKeyword,
               searchCateID: searchCateID,
+              sortBy: sortBy,
+              direction: sortDirection, // 정렬 방향
             },
             success: function (response) {
-              $("#product-list").html(response);
+              $("#product-list").html(response); // 성공 시 결과를 product-list 영역에 업데이트
             },
             error: function (error) {
-              console.error("Error fetching board list data:", error);
+              console.error("Error fetching board list data:", error); // 오류 처리
             },
           });
         }
-
-        $(document).ready(function () {
-          fetchBoardListData(0);
-        });
       </script>
     </div>
   </body>

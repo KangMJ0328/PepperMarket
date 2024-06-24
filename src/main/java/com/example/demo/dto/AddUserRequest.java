@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -25,13 +26,8 @@ public class AddUserRequest {
 
     @NotEmpty(message = "비밀번호 확인을 입력해 주세요.")
     private String passwordCheck; // 비밀번호 확인
+    
 
-    @NotEmpty(message = "성별을 입력해주세요")
-    private String gender; // 성별
-
-    @DateTimeFormat(pattern = "yyyyMMdd")
-    @NotEmpty(message = "생년월일을 입력해주세요")
-    private LocalDate birthDate; // 생년월일
 
     @NotBlank
     private String name; // 이름

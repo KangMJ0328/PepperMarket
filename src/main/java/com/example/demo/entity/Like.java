@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @Getter
@@ -21,4 +23,7 @@ public class Like {
 
     @Column(name = "user_email", nullable = false)
     private String userEmail;
+    
+    @Column(name = "liked_time")
+    private LocalDateTime likedTime;
 }

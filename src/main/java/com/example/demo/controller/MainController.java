@@ -2,13 +2,16 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.Board;
 import com.example.demo.entity.PrincipalDetails;
+import com.example.demo.entity.Users;
 import com.example.demo.service.BoardService;
+import com.example.demo.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +24,8 @@ public class MainController {
     
     @Autowired // BoardService를 주입받아 사용
     private BoardService boardService;
+    @Autowired
+    private MemberService memberService;
     
     // 루트 URL ("/") 요청을 처리하는 메서드
     @GetMapping("/")
@@ -40,8 +45,14 @@ public class MainController {
         // "main" 뷰를 반환 (resources/templates/main.html 파일을 가리킴)
         return "main"; // main.html 템플릿 반환
     }
-
-
+    @GetMapping("/mypage")
+    public String myPage(@AuthenticationPrincipal UserDetails userDetails, Model model) throws Exception {
+        String email = userDetails.getUsername();
+        Users user = memberService.findByEmail(email);
+        model.addAttribute("user", user);
+        return "mypage";
+    }
+    
     // "/chat" URL 요청을 처리하는 메서드
     @GetMapping("/chat")
     public ModelAndView showChatMainPage(@AuthenticationPrincipal PrincipalDetails principalDetails) {
@@ -59,4 +70,10 @@ public class MainController {
     public String usernametest() {
         return "usernametest";
     }
+
+    @GetMapping("/qna")
+    public String qna() {
+        return "qna";
+    }
+
 }

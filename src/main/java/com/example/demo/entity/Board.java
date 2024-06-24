@@ -2,17 +2,20 @@ package com.example.demo.entity;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import static com.example.demo.service.CategoryService.categoryList;
 
@@ -34,7 +37,7 @@ public class Board {
 
     private String title; // 게시글 제목
     private String content; // 게시글 내용
-    private String price; // 가격
+    private Integer price; // 가격
     private String filename; // 파일 이름
     private String filepath; // 파일 경로
     private Integer viewcount; // 조회수
@@ -44,11 +47,13 @@ public class Board {
     private String quality;
     private Integer status; // 판매 상태 1:판매중, 2:예약중 3:판매완료
     private int likes; // 좋아요 갯수
-
+    
+    @JsonIgnore
     @OneToMany(mappedBy = "board")
     private List<ChatRoom> chatRooms;
 
     @ManyToOne
+    @JsonManagedReference
     @JoinColumn(name = "user_id")
     private Users user; // 게시글 작성자
 
@@ -57,6 +62,7 @@ public class Board {
 
     @Column(name = "modifydate", nullable = true)
     private LocalDateTime modifyDate; // 수정일
+    
     @Getter
     @Setter
     @Transient
@@ -72,6 +78,14 @@ public class Board {
             case "perfect" -> "매우 좋음";
             case "good" -> "좋음";
             case "bad" -> "보통";
+            default -> " ";
+        };
+    }
+    public String statusHangul(){
+        return switch (status) {
+            case 1 -> "거래 가능";
+            case 2 -> "예약중";
+            case 3 -> "거래 완료";
             default -> " ";
         };
     }
@@ -93,11 +107,11 @@ public class Board {
 //    private Category category;
 
     public String getFormattedPrice() {
-        if (price == null || price.isEmpty()) {
+        if (price == null) {
             return "가격 정보 없음";
         }
         try {
-            double priceValue = Double.parseDouble(price);
+            double priceValue = Double.parseDouble(String.valueOf(price));
             DecimalFormat decimalFormat = new DecimalFormat("#,###");
             return decimalFormat.format(priceValue);
         } catch (NumberFormatException e) {
@@ -113,7 +127,26 @@ public class Board {
         Date date = Date.from(this.createDate.atZone(ZoneId.systemDefault()).toInstant());
         return Time.calculateTime(date);
     }
+    // modifyDate를 기준으로 몇 분 전, 몇 시간 전 등을 반환하는 메서드
+    public String getModifiedTimeAgo() {
+        if (this.modifyDate == null) {
+            return "null";
+        }
+        Date date = Date.from(this.modifyDate.atZone(ZoneId.systemDefault()).toInstant());
+        return Time.calculateTime(date);
+    }
     
+    public String getCreateDateFormatted() {
+        if (this.createDate == null) {
+            return "날짜 정보 없음";
+        }
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm");
+        return createDate.format(formatter);
+    }
+
+
+
     // getters and setters...
 	
 }

@@ -30,4 +30,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     List<ChatMessage> findBySender(Users sender);
 
     List<ChatMessage> findByChatRoomId(Long chatRoomId);
+
+    // 특정 채팅방 ID, 수신자, 읽음 여부로 메시지를 조회하는 메서드 추가
+    List<ChatMessage> findByChatRoomIdAndReceiverAndIsRead(Long chatRoomId, Users receiver, boolean isRead);
 }

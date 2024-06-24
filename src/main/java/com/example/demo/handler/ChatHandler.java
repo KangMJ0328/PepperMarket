@@ -53,9 +53,9 @@ public class ChatHandler extends TextWebSocketHandler {
         chatMessage.setContent(payload);
         chatMessage.setTimestamp(LocalDateTime.now()); // 현재 시간을 타임스탬프로 설정
 
-        // sender와 receiver 설정 (예제 ID 사용, 실제 사용 시 동적 할당 필요)
-        Users sender = userRepository.findById(1L).orElseThrow(); // 예제: ID가 1인 사용자 찾기
-        Users receiver = userRepository.findById(2L).orElseThrow(); // 예제: ID가 2인 사용자 찾기
+        // sender와 receiver 설정 (ID 사용, 실제 사용 시 동적 할당 필요)
+        Users sender = userRepository.findById(1L).orElseThrow(); // ID가 1인 사용자 찾기
+        Users receiver = userRepository.findById(2L).orElseThrow(); //  ID가 2인 사용자 찾기
         chatMessage.setSender(sender); // 발신자 설정
         chatMessage.setReceiver(receiver); // 수신자 설정
 

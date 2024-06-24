@@ -17,10 +17,20 @@ public class Notification {
     private boolean isRead;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private Users user;
 
     @ManyToOne
     @JoinColumn(name = "board_id")
     private Board board;
+
+    @ManyToOne
+    @JoinColumn(name = "chat_message_id")
+    private ChatMessage chatMessage;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private Users receiver; // 알림을 받을 사용자.
+
+    private Long chatRoomId;
 }

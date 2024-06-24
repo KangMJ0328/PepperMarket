@@ -21,18 +21,5 @@ public class BoardServiceImpl extends BoardService {
 		super(userRepository);
 	}
 	
-	@Override
-	public Page<Board> searchBoards(String searchKeyword, Integer searchCateID, Pageable pageable, boolean showCompleted, UserDetails userDetails) {
-		Integer status = showCompleted ? null : 3; // showCompleted가 true이면 status를 null로 설정하여 모든 상태의 게시글을 가져옴
-		Page<Board> boards = boardRepository.searchBoards(searchKeyword, searchCateID, status, pageable);
-		
-		String username = userDetails != null ? userDetails.getUsername() : null;
-		
-		for (Board board : boards) {
-			boolean liked = username != null && likeService.hasUserLiked(Long.valueOf(board.getId()), username);
-			board.setLiked(liked);
-		}
-		
-		return boards;
-	}
+	
 }

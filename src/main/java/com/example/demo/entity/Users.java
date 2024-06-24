@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,9 +25,6 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
-
     private boolean isSuspended;
 
     @Column(nullable = false, unique = true)
@@ -38,11 +36,18 @@ public class Users implements UserDetails {
     private String nickname;
 
     private String profilePictureUrl;
+    
+    private String profilePicPath;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Comment> comments;
-
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "user")
+    private List<Board> boards;
+    
+    
     @Column(name = "provider")
     private String provider;
 
@@ -62,10 +67,16 @@ public class Users implements UserDetails {
     @Temporal(TemporalType.DATE)
     private Date birthdate;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Stream.of(new SimpleGrantedAuthority(role.getAuthority()))
-                .collect(Collectors.toList());
+        // role이 null인 경우 기본 권한을 설정
+        if (role == null) {
+            return Stream.of(new SimpleGrantedAuthority(UserRole.USER.getAuthority())).collect(Collectors.toList());
+        }
+        return Stream.of(new SimpleGrantedAuthority(role.getAuthority())).collect(Collectors.toList());
     }
 
     @Override

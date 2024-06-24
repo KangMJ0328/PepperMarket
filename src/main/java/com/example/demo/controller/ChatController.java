@@ -2,7 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.ChatMessage;
 import com.example.demo.entity.ChatRoom;
-import com.example.demo.entity.Board;
 import com.example.demo.entity.PrincipalDetails;
 import com.example.demo.entity.Users;
 import com.example.demo.repository.UserRepository;
@@ -40,7 +39,6 @@ public class ChatController {
         this.boardService = boardService;
     }
 
-    // 새로운 채팅을 시작하는 엔드포인트
     @GetMapping("/start")
     public ModelAndView startChat(@RequestParam Long receiverId, @RequestParam Long postId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         Long senderId = principalDetails.getUser().getId();
@@ -49,7 +47,6 @@ public class ChatController {
         return new ModelAndView("redirect:/chat/room/" + chatRoomId + "?receiverId=" + receiverId);
     }
 
-    // 특정 채팅방을 불러오는 엔드포인트
     @GetMapping("/room/{chatRoomId}")
     public ModelAndView getChatRoom(@PathVariable Long chatRoomId, @RequestParam Long receiverId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         ModelAndView modelAndView = new ModelAndView("chatRoom");
@@ -59,7 +56,6 @@ public class ChatController {
         return modelAndView;
     }
 
-    // 메시지를 보내는 엔드포인트
     @PostMapping("/send")
     public ResponseEntity<ChatMessage> sendMessage(@RequestParam Long chatRoomId, @RequestParam Long receiverId, @RequestParam String content, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         try {
@@ -105,13 +101,6 @@ public class ChatController {
                 chatRoomInfo.put("chatRoomId", room.getId().toString());
                 chatRoomInfo.put("partnerName", getPartnerName(room, userId));
                 chatRoomInfo.put("partnerId", String.valueOf(room.getReceiverId().equals(userId) ? room.getSenderId() : room.getReceiverId()));
-
-                // Ensure board is initialized
-                if (room.getBoard() == null) {
-                    Board board = boardService.getBoardById(Long.valueOf(room.getBoard().getId()));
-                    room.setBoard(board);
-                }
-
                 chatRoomInfo.put("postId", String.valueOf(room.getPostId()));
 
                 String postTitle = boardService.getBoardTitleByPostId(room.getPostId());
@@ -138,9 +127,10 @@ public class ChatController {
                 Map<String, Object> chatRoomInfo = new HashMap<>();
                 chatRoomInfo.put("partnerName", getPartnerName(room, room.getSenderId()));
                 chatRoomInfo.put("postId", room.getPostId());
-
+                chatRoomInfo.put("postCount", getPartnerPostCount(room, room.getSenderId()));
                 chatRoomInfo.put("postTitle", boardService.getBoardTitleByPostId(room.getPostId()));
                 chatRoomInfo.put("postPic", room.getPostPic());
+                chatRoomInfo.put("partnerId", String.valueOf(room.getReceiverId().equals(room.getSenderId()) ? room.getSenderId() : room.getReceiverId()));
 
                 return ResponseEntity.ok(chatRoomInfo);
             } else {
@@ -155,5 +145,9 @@ public class ChatController {
     private String getPartnerName(ChatRoom room, Long userId) {
         Long partnerId = room.getSenderId().equals(userId) ? room.getReceiverId() : room.getSenderId();
         return userRepository.findById(partnerId).map(Users::getNickname).orElse("Unknown");
+    }
+    private Long getPartnerPostCount(ChatRoom room, Long userId) {
+        Long partnerId = room.getSenderId().equals(userId) ? room.getReceiverId() : room.getSenderId();
+        return boardService.getBoardCountByUserId(partnerId);
     }
 }

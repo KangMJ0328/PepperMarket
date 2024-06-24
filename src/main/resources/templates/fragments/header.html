@@ -1,116 +1,211 @@
 <!doctype html>
 <html
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
-  lang="ko"
+	lang="ko"
+	xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+	xmlns:th="http://www.thymeleaf.org"
 >
-  <head>
-    <meta charset="UTF-8" />
-    <title>페퍼마켓에 오신 것을 환영합니다</title>
-  </head>
-  <th:block th:fragment="header">
-    <div class="header-wrapper">
-      <div class="header-box">
-        <div class="header-1">
-          <div class="header-notification">
-            <a class="header1" id="notificationButton">
-              <i class="far fa-bell icon"></i>
-              <div class="badg">나의 알림</div>
-            </a>
-            <span
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-              id="noti-count"
-            ></span>
+<head>
+	<meta charset="UTF-8"/>
+	<title>페퍼마켓에 오신 것을 환영합니다</title>
+</head>
+<th:block th:fragment="header">
+	<div class="header-wrapper">
+		<div class="header-box">
+			<div class="header-1">
+				<div class="header-notification">
+					<div class="dropdown">
+						<a
+							aria-expanded="false"
+							class="header1"
+							data-bs-toggle="dropdown"
+							id="notificationButton"
+							role="button"
+						>
+							<i class="far fa-bell icon"></i>
+							<div class="badg">나의 알림</div>
+						</a>
+						<span
+							class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+							id="noti-count"
+						></span>
+						<div
+							aria-labelledby="notificationDropdown"
+							class="dropdown-menu dropdown-menu-end"
+						>
+							<div class="noti-pop-box" id="notiPop">
+								<!-- 여기에 알림 내용을 동적으로 추가할 수 있음 -->
+								<div id="noti-pop-content"></div>
+								<div class="noti-pop-footer">
+									<button
+										class="btn btn-primary"
+										id="notiPopClose"
+										onclick="location.href='/noti'"
+										type="button"
+									>
+										알림센터로 가기
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="header-chat">
+					<a class="header1" href="/chat">
+						<i class="far fa-comment icon"></i>
+						<div class="badg">채팅</div>
+					</a>
+				</div>
+				<div class="header-profile">
+					<!--                            로그인시        -->
+					<div class="dropdown" sec:authorize="isAuthenticated()">
+						<a
+							aria-expanded="false"
+							class="header1 dropdown-toggle"
+							data-bs-toggle="dropdown"
+							id="dropdownMenuButton"
+							type="button"
+						>
+							<img alt="profile picture" class="profile-img" th:src="@{${myProfilePic}}">
+							<p
+								class="profile-name badg"
+								th:text="${#authentication.principal.nickname}"
+							></p>
+						</a>
+						<div
+							aria-labelledby="dropdownMenuButton"
+							class="dropdown-menu dropdown-menu-end"
+						>
+							<a class="dropdown-item" href="/mypage">마이 페이지</a>
+							<hr class="dropdown-divider"/>
+							<a class="dropdown-item" href="/logout">로그아웃</a>
+						</div>
+					</div>
 
-            <div class="noti-pop-box" id="notiPop" style="display: none">
-              <!-- 여기에 알림 내용을 동적으로 추가할 수 있음 -->
-              <div id="noti-pop-content"></div>
-            </div>
-          </div>
-          <div class="header-chat">
-            <a class="header1" href="/chat">
-              <i class="far fa-comment icon"></i>
-              <div class="badg">채팅</div>
-            </a>
-          </div>
-          <div class="header-profile">
-            <!--                            로그인시        -->
-            <div class="dropdown" sec:authorize="isAuthenticated()">
-              <a
-                aria-expanded="false"
-                class="header1 dropdown-toggle"
-                data-bs-toggle="dropdown"
-                id="dropdownMenuButton"
-                type="button"
-              >
-                <p
-                  class="profile-name badg"
-                  th:text="${#authentication.principal.nickname}"
-                ></p>
-              </a>
-              <div
-                aria-labelledby="dropdownMenuButton"
-                class="dropdown-menu dropdown-menu-end"
-              >
-                <a class="dropdown-item" href="/mypage">마이 페이지</a>
-                <a class="dropdown-item" href="#">메뉴2</a>
-                <hr class="dropdown-divider" />
-                <a class="dropdown-item" href="/logout">로그아웃</a>
-              </div>
-            </div>
-
-            <!--                            비로그인시       -->
-            <a class="header1" href="/login" sec:authorize="isAnonymous()">
-              <div class="badg">로그인/회원가입</div>
-            </a>
-          </div>
-        </div>
-        <div class="header-2">
-          <div class="logo">
-            <a href="/"><img alt="" src="/img/logo (5).png" /></a>
-          </div>
-          <div class="search-box-wrapper">
-            <form method="get" th:action="@{/board/list}">
-              <div class="search-box">
-                <div class="search-input-wrap">
-                  <!--카테고리 -->
-                  <div class="form-group search-cate">
-                    <select
-                      class="form-select categ"
-                      id="categ"
-                      name="searchCateID"
-                      required
-                    >
-                      <option value=" ">전체 카테고리</option>
-                      <th:block th:each="board, iterStat : ${categList}">
-                        <option
-                          th:selected="${#strings.equals(param.searchCateID, (iterStat.index + 1))}"
-                          th:text="${board}"
-                          th:value="${iterStat.index + 1}"
-                        ></option>
-                      </th:block>
-                    </select>
-                    <div class="invalid-feedback">카테고리를 선택하세요.</div>
-                  </div>
-                  <!-- 검색어 입력 폼 -->
-                  <input
-                    class="search"
-                    name="searchKeyword"
-                    placeholder="어떤 상품을 찾으시나요?"
-                    required
-                    th:value="${param.searchKeyword}"
-                    type="text"
-                  />
-                </div>
-                <button type="submit">
-                  <i class="fas fa-search dotbogi"></i>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="header-underline"></div>
-    </div>
-  </th:block>
+					<!--                            비로그인시       -->
+					<a class="header1" href="/login" sec:authorize="isAnonymous()">
+						<div class="badg">로그인/회원가입</div>
+					</a>
+				</div>
+			</div>
+			<div class="header-2">
+				<div class="logo">
+					<a href="/"><img alt="" src="/img/main_logo.png"/></a>
+				</div>
+				<div class="search-box-wrapper">
+					<form method="get" th:action="@{/board/list}">
+						<div class="search-box">
+							<div class="search-input-wrap">
+								<!--카테고리 -->
+								<div class="form-group search-cate">
+									<select
+										class="form-select categ"
+										id="categ"
+										name="searchCateID"
+										required
+									>
+										<option value=" ">전체 카테고리</option>
+										<th:block th:each="board, iterStat : ${categList}">
+											<option
+												th:selected="${#strings.equals(param.searchCateID, (iterStat.index + 1))}"
+												th:text="${board}"
+												th:value="${iterStat.index + 1}"
+											></option>
+										</th:block>
+									</select>
+									<div class="invalid-feedback">카테고리를 선택하세요.</div>
+								</div>
+								<!-- 검색어 입력 폼 -->
+								<input
+									class="search"
+									name="searchKeyword"
+									placeholder="어떤 상품을 찾으시나요?"
+									required
+									th:value="${param.searchKeyword}"
+									type="text"
+								/>
+							</div>
+							<button type="submit">
+								<i class="fas fa-search dotbogi"></i>
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="upload-wrapper">
+					<a class="write" href="/board/write" role="button">
+						<i aria-hidden="true" class="fas fa-pen-square"> &nbsp; </i>
+						내 물건 올리기
+					</a>
+				</div>
+				<div class="top-menu-btn"type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop" aria-controls="offcanvasTop"><span class="material-symbols-outlined">menu</span></div>
+			</div>
+		</div>
+		<div class="header-underline"></div>
+		<div class="offcanvas offcanvas-top top-menu" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+			<div class="offcanvas-header">
+				<h5 id="offcanvasTopLabel">카테고리 둘러보기</h5>
+				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+			</div>
+			<div class="offcanvas-body">
+				<div class="top-categories">
+					<a href="/board/list" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">apps</span>
+					</div>
+						<span>전체 상품 보기</span>
+					</a>
+					<a href="/board/list?searchCateID=1" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined cloth-icon">apparel</span>
+						<span class="material-symbols-outlined man-icon">man</span>
+					</div>
+						<span>남성 의류</span>
+					</a>
+					<a href="/board/list?searchCateID=2" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined cloth-icon">apparel</span>
+						<span class="material-symbols-outlined man-icon">woman</span>
+					</div>
+						<span>여성 의류</span>
+					</a>
+					<a href="/board/list?searchCateID=3" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">shoppingmode</span>
+					</div>
+						<span>잡화</span>
+					</a>
+					<a href="/board/list?searchCateID=4" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">devices</span>
+					</div>
+						<span>디지털</span>
+					</a>
+					<a href="/board/list?searchCateID=5" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">stadia_controller</span>
+					</div>
+						<span>취미/게임</span>
+					</a>
+					<a href="/board/list?searchCateID=6" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">sports_and_outdoors</span>
+					</div>
+						<span>스포츠/레저</span>
+					</a>
+					<a href="/board/list?searchCateID=7" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">chair</span>
+					</div>
+						<span>가구/인테리어</span>
+					</a>
+					<a href="/board/list?searchCateID=8" class="top-icon-box">
+						<div class="top-icon">
+						<span class="material-symbols-outlined">pets</span>
+					</div>
+						<span>반려동물/식물</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</th:block>
 </html>

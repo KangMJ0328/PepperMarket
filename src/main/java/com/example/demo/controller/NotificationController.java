@@ -11,75 +11,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController // RESTful 웹 서비스를 위한 컨트롤러
-@RequestMapping("/notifications") // "/notifications" 경로로 들어오는 요청을 처리
+@RestController
+@RequestMapping("/notifications")
 public class NotificationController {
 
-    @Autowired // NotificationService를 주입받아 사용
+    @Autowired
     private NotificationService notificationService;
 
-    @Autowired // NotificationRepository를 주입받아 사용
+    @Autowired
     private NotificationRepository notificationRepository;
-    
-    @Autowired // UserRepository를 주입받아 사용
+
+    @Autowired
     private UserRepository userRepository;
 
-    // 특정 사용자의 알림 리스트를 가져오는 엔드포인트
     @GetMapping
     public ResponseEntity<List<Notification>> getNotifications(@RequestParam Long userId) {
-        // 주어진 userId로 사용자 정보를 검색
         Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        // 사용자의 알림 리스트를 가져와서 HTTP 응답으로 반환
-        return ResponseEntity.ok(notificationService.findByUser(user));
-    }
-    //헤더의 팝업버튼으로 알림 리스트 가져오는 엔드포인트
-    @GetMapping("/popup")
-    public ResponseEntity<List<Notification>> getPopupNotifications(@RequestParam Long userId) {
-        // 주어진 userId로 사용자 정보를 검색
-        Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        // 사용자의 알림 리스트를 가져와서 HTTP 응답으로 반환
         return ResponseEntity.ok(notificationService.findByUser(user));
     }
 
-    // 특정 알림을 읽음 상태로 표시하는 엔드포인트
+    // @GetMapping("/popup") 제거한 이유:
+    // 별도의 팝업버튼으로 알림 리스트를 가져오는 엔드포인트가 필요하지 않기 때문에 제거
+    // 모든 알림을 가져오는 기능은 @GetMapping 엔드포인트에서 처리
+    // 만약 팝업버튼에서 알림 리스트를 가져오는 기능이 필요, 기존의 @GetMapping 엔드포인트를 사용
+
     @PostMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(@PathVariable Long id) {
-//        Notification notification = notificationRepository.findById(id).orElseThrow();
-//        if(notification.isRead()) {
-//            notificationService.markAsUnRead(id);
-//        }else{
-//            notificationService.markAsRead(id);
-//        }
-        // 주어진 알림 ID로 알림을 읽음 상태로 표시
         notificationService.markAsRead(id);
-        // HTTP 204 No Content 응답 반환
         return ResponseEntity.noContent().build();
     }
-    
-    // 특정 알림을 읽음/안읽음 상태 토글하는 엔드포인트
+
     @PostMapping("/{id}/readtoggle")
     public ResponseEntity<Void> markAsReadToggle(@PathVariable Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow();
-        if(notification.isRead()) {
+        Notification notification = notificationRepository.findById(id).orElseThrow(() -> new RuntimeException("Notification not found"));
+        if (notification.isRead()) {
             notificationService.markAsUnRead(id);
-        }else{
+        } else {
             notificationService.markAsRead(id);
         }
-//        // 주어진 알림 ID로 알림을 읽음 상태로 표시
-//        notificationService.markAsRead(id);
-        // HTTP 204 No Content 응답 반환
         return ResponseEntity.noContent().build();
     }
-    
-    // 특정 알림을 삭제하는 엔드포인트
+
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<Void> deleteByNotificationId(@PathVariable Long id) {
         notificationService.deleteNoti(id);
-        // HTTP 204 No Content 응답 반환
         return ResponseEntity.noContent().build();
     }
-    
-
-    
-    
 }
